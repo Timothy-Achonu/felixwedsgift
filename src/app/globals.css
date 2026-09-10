@@ -1,0 +1,51 @@
+@import "tailwindcss";
+
+:root {
+  --wedding-navy: #000330;
+  --wedding-blue: #6698d3;
+  --wedding-brown: #421c0f;
+  --wedding-cream: #fae5c6;
+  --font-body: Arial, Helvetica, sans-serif;
+  --font-display: Georgia, "Times New Roman", serif;
+}
+
+@theme inline {
+  --color-wedding-navy: var(--wedding-navy);
+  --color-wedding-blue: var(--wedding-blue);
+  --color-wedding-brown: var(--wedding-brown);
+  --color-wedding-cream: var(--wedding-cream);
+  --font-sans: var(--font-body);
+  --font-serif: var(--font-display);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--wedding-cream);
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  background: var(--wedding-cream);
+  color: var(--wedding-navy);
+  font-family: var(--font-body);
+}
+
+::selection {
+  background: var(--wedding-blue);
+  color: var(--wedding-navy);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
