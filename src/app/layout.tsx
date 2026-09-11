@@ -1,11 +1,13 @@
 import type { Metadata, Viewport } from "next";
-import { Bodoni_Moda, Manrope } from "next/font/google";
+import { Fraunces, Manrope } from "next/font/google";
 import "./globals.css";
 
-const displayFont = Bodoni_Moda({
+const displayFont = Fraunces({
   subsets: ["latin"],
-  variable: "--font-bodoni",
+  variable: "--font-fraunces",
   display: "swap",
+  style: ["normal", "italic"],
+  axes: ["SOFT", "WONK", "opsz"],
 });
 
 const bodyFont = Manrope({

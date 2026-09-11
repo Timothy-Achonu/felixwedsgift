@@ -1,5 +1,7 @@
 import type { WeddingContent, WeddingPhoto } from "@/types/wedding";
 
+import { mockRemoteGalleryPhotos } from "./mock-remote-gallery";
+
 const photos = {
   hero: {
     id: "hero-couple",
@@ -138,6 +140,7 @@ export const mockWeddingContent = {
     photos.galleryPortrait,
     photos.portrait,
     photos.hero,
+    ...mockRemoteGalleryPhotos,
   ],
 } satisfies WeddingContent;
 

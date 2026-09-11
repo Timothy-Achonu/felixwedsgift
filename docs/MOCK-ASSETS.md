@@ -2,6 +2,8 @@
 
 The images under `public/images/wedding/` are temporary presentation assets. They show stock models and must not be described as photographs of Felix and Gift. Replace them before enabling search indexing or launching the website.
 
+The extra gallery wall images are Unsplash CDN links in `src/data/mock-remote-gallery.ts`, not local files.
+
 | Local file             | Source                                                                                                            |
 | ---------------------- | ----------------------------------------------------------------------------------------------------------------- |
 | `hero-couple.jpg`      | [Pexels photo 33403878](https://www.pexels.com/photo/elegant-black-couple-wedding-in-modern-setting-33403878/)    |

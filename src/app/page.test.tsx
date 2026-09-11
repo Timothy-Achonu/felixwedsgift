@@ -11,7 +11,7 @@ describe("home page", () => {
       screen.getByRole("heading", { name: "Felix & Gift" }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("heading", { name: "Our story" }),
+      screen.getByRole("heading", { name: "We found home in each other." }),
     ).toBeInTheDocument();
     expect(
       screen.getByRole("heading", { name: "Meet us in Lagos" }),
@@ -25,5 +25,11 @@ describe("home page", () => {
     expect(
       screen.getByRole("heading", { name: "Love, held in a frame." }),
     ).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", { name: "View full gallery" }),
+    ).toHaveAttribute("href", "/gallery");
+    expect(screen.getAllByRole("button", { name: /Open photo/ })).toHaveLength(
+      5,
+    );
   });
 });

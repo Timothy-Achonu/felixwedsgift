@@ -5,16 +5,13 @@ import { PhotoUploadDemo } from "@/components/wedding/photo-upload-demo";
 
 describe("photo upload prototype", () => {
   beforeEach(() => {
-    vi.stubGlobal("URL", {
-      ...URL,
-      createObjectURL: vi.fn(() => "blob:photo-preview"),
-      revokeObjectURL: vi.fn(),
-    });
+    vi.spyOn(URL, "createObjectURL").mockReturnValue("blob:photo-preview");
+    vi.spyOn(URL, "revokeObjectURL").mockImplementation(() => undefined);
   });
 
   afterEach(() => {
     vi.useRealTimers();
-    vi.unstubAllGlobals();
+    vi.restoreAllMocks();
   });
 
   it("previews and removes a supported photo locally", () => {

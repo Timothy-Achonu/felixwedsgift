@@ -1,5 +1,12 @@
-import { ArrowDown, ArrowUpRight, Camera, MapPin } from "lucide-react";
+import {
+  ArrowDown,
+  ArrowRight,
+  ArrowUpRight,
+  Camera,
+  MapPin,
+} from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 
 import { WeddingCountdown } from "@/components/wedding/countdown";
 import { PhotoUploadDemo } from "@/components/wedding/photo-upload-demo";
@@ -231,27 +238,38 @@ export default async function Home() {
         </div>
       </section>
 
-      <section
-        id="gallery"
-        className="gallery section-anchor"
-        aria-labelledby="gallery-heading"
-      >
-        <div className="section-shell">
-          <Reveal className="gallery-heading">
-            <div>
-              <p className="eyebrow">The wedding album</p>
-              <h2 id="gallery-heading" className="section-title font-display">
-                Love, held in a frame.
-              </h2>
-            </div>
-            <p>
-              A preview collection for the experience. These photographs are
-              mock imagery and will be replaced before launch.
-            </p>
-          </Reveal>
-          <WeddingGallery photos={wedding.gallery} />
-        </div>
-      </section>
+      {wedding.gallery.length > 0 ? (
+        <section
+          id="gallery"
+          className="gallery section-anchor"
+          aria-labelledby="gallery-heading"
+        >
+          <div className="section-shell">
+            <Reveal className="gallery-heading">
+              <div>
+                <p className="eyebrow">The wedding album</p>
+                <h2 id="gallery-heading" className="section-title font-display">
+                  Love, held in a frame.
+                </h2>
+              </div>
+              <p>
+                A preview collection for the experience. These photographs are
+                mock imagery and will be replaced before launch.
+              </p>
+            </Reveal>
+          </div>
+          <WeddingGallery photos={wedding.gallery} variant="carousel" />
+          <div className="section-shell gallery-more">
+            <Link
+              href="/gallery"
+              className="button button-outline-navy focus-ring"
+            >
+              View full gallery
+              <ArrowRight aria-hidden="true" className="size-4" />
+            </Link>
+          </div>
+        </section>
+      ) : null}
 
       <footer className="footer">
         <div className="section-shell footer-grid">

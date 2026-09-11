@@ -8,7 +8,7 @@
   --wedding-paper: #fff8ec;
   --wedding-mist: #d9e5f4;
   --font-body: var(--font-manrope), "Segoe UI", sans-serif;
-  --font-display: var(--font-bodoni), Georgia, serif;
+  --font-display: var(--font-fraunces), Georgia, serif;
 }
 
 @theme inline {
@@ -70,6 +70,10 @@ button:disabled {
 
 .font-display {
   font-family: var(--font-display);
+  font-optical-sizing: auto;
+  font-variation-settings:
+    "WONK" 1,
+    "SOFT" 40;
 }
 
 .section-shell {
@@ -93,6 +97,7 @@ button:disabled {
   margin: 0;
   font-size: 3rem;
   font-weight: 500;
+  letter-spacing: -0.025em;
   line-height: 0.98;
 }
 
@@ -233,6 +238,7 @@ a:focus-visible {
   margin: 0;
   font-size: 4.5rem;
   font-weight: 500;
+  letter-spacing: -0.03em;
   line-height: 0.8;
 }
 
@@ -414,7 +420,11 @@ a:focus-visible {
 .countdown-value {
   font-family: var(--font-display);
   font-size: 2.35rem;
+  font-optical-sizing: auto;
   font-variant-numeric: tabular-nums;
+  font-variation-settings:
+    "WONK" 0,
+    "SOFT" 40;
   line-height: 1;
 }
 
@@ -568,6 +578,10 @@ a:focus-visible {
   color: var(--wedding-blue);
   font-family: var(--font-display);
   font-size: 1rem;
+  font-optical-sizing: auto;
+  font-variation-settings:
+    "WONK" 0,
+    "SOFT" 40;
 }
 
 .detail-block h3 {
@@ -575,6 +589,10 @@ a:focus-visible {
   color: var(--wedding-brown);
   font-size: 3.7rem;
   font-weight: 500;
+  font-optical-sizing: auto;
+  font-variation-settings:
+    "WONK" 0,
+    "SOFT" 40;
   line-height: 1;
 }
 
@@ -994,16 +1012,48 @@ a:focus-visible {
   line-height: 1.75;
 }
 
+.gallery-carousel-shell {
+  --gallery-carousel-gutter: max(1.25rem, calc((100vw - 1240px) / 2));
+  position: relative;
+}
+
+.gallery-carousel {
+  display: flex;
+  gap: 1rem;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  padding-inline: var(--gallery-carousel-gutter);
+  scroll-padding-inline: var(--gallery-carousel-gutter);
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+
+.gallery-carousel::-webkit-scrollbar {
+  display: none;
+}
+
+.gallery-carousel-item {
+  flex: 0 0 min(82vw, 31rem);
+  height: clamp(23rem, 110vw, 34rem);
+  scroll-snap-align: center;
+}
+
+.gallery-carousel-item.is-landscape {
+  flex-basis: min(88vw, 46rem);
+}
+
 .gallery-wall {
   columns: 1;
-  column-gap: 1rem;
+  column-gap: 0;
+  line-height: 0;
 }
 
 .gallery-item {
   display: inline-block;
   width: 100%;
-  margin: 0 0 1.8rem;
+  margin: 0;
   break-inside: avoid;
+  vertical-align: top;
 }
 
 .gallery-button {
@@ -1014,6 +1064,14 @@ a:focus-visible {
   border: 0;
   padding: 0;
   background: var(--wedding-mist);
+}
+
+.gallery-carousel .gallery-button {
+  height: 100%;
+}
+
+.gallery-carousel .gallery-button img {
+  object-fit: cover;
 }
 
 .gallery-button img {
@@ -1051,22 +1109,171 @@ a:focus-visible {
   transform: translateY(0);
 }
 
-.gallery-item figcaption {
-  margin-top: 0.65rem;
-  color: var(--wedding-brown);
-  font-family: var(--font-display);
-  font-size: 1rem;
-  font-style: italic;
+.gallery-wall .gallery-button:focus-visible {
+  z-index: 1;
+  outline-offset: -4px;
+}
+
+.gallery-carousel-controls {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.gallery-carousel-arrow {
+  position: absolute;
+  top: 50%;
+  z-index: 1;
+  display: grid;
+  width: 3rem;
+  height: 3rem;
+  transform: translateY(-50%);
+  place-items: center;
+  pointer-events: auto;
+  border: 0;
+  border-radius: 50%;
+  background: var(--wedding-navy);
+  color: var(--wedding-cream);
+  transition:
+    background-color 180ms ease,
+    color 180ms ease;
+}
+
+.gallery-carousel-previous {
+  left: max(
+    calc(env(safe-area-inset-left, 0px) + 0.75rem),
+    calc(var(--gallery-carousel-gutter) + 0.75rem)
+  );
+}
+
+.gallery-carousel-next {
+  right: max(
+    calc(env(safe-area-inset-right, 0px) + 0.75rem),
+    calc(var(--gallery-carousel-gutter) + 0.75rem)
+  );
+}
+
+.gallery-carousel-arrow:hover:not(:disabled) {
+  background: var(--wedding-cream);
+  color: var(--wedding-navy);
+}
+
+.gallery-carousel-arrow:disabled {
+  visibility: hidden;
 }
 
 .gallery-more {
   display: flex;
   justify-content: center;
-  margin-top: 2rem;
+  margin-top: 2.5rem;
 }
 
-.gallery-more .button span {
+.gallery-empty {
+  padding: 6rem 1.25rem;
+  background: var(--wedding-paper);
+  text-align: center;
+}
+
+.gallery-empty > p:last-child {
+  max-width: 14ch;
+  margin: 1rem auto 0;
+  font-size: clamp(2rem, 6vw, 4rem);
+  line-height: 1;
+}
+
+/* Gallery page */
+.gallery-page {
+  min-height: 100vh;
+  background: var(--wedding-paper);
+}
+
+.gallery-page-hero {
+  position: relative;
+  overflow: hidden;
+  padding: 10rem 0 4.5rem;
+  background: var(--wedding-navy);
+  color: var(--wedding-cream);
+}
+
+.gallery-page-hero::after {
+  position: absolute;
+  right: -8rem;
+  bottom: -16rem;
+  width: 30rem;
+  height: 30rem;
+  border: 1px solid rgb(102 152 211 / 40%);
+  border-radius: 50%;
+  content: "";
+}
+
+.gallery-page-intro {
+  position: relative;
+  z-index: 1;
+}
+
+.gallery-page-intro h1 {
+  max-width: 10ch;
+  margin: 0.75rem 0 2.5rem;
+  font-size: clamp(4rem, 13vw, 9rem);
+  font-weight: 500;
+  letter-spacing: -0.04em;
+  line-height: 0.82;
+}
+
+.gallery-page-meta {
+  display: grid;
+  gap: 1.5rem;
+  align-items: end;
+}
+
+.gallery-page-meta p {
+  max-width: 36rem;
+  margin: 0;
+  color: rgb(250 229 198 / 72%);
+  font-size: 0.9rem;
+  line-height: 1.75;
+}
+
+.gallery-page-meta span {
   color: var(--wedding-blue);
+  font-size: 0.7rem;
+  font-weight: 750;
+  text-transform: uppercase;
+}
+
+.gallery-page-wall {
+  min-height: 20rem;
+}
+
+.gallery-page-footer {
+  padding: 2.5rem 0;
+  background: var(--wedding-brown);
+  color: var(--wedding-cream);
+}
+
+.gallery-page-footer .section-shell {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+}
+
+.gallery-page-footer p {
+  margin: 0;
+  font-size: 2rem;
+  font-style: italic;
+}
+
+.gallery-page-footer a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: inherit;
+  font-size: 0.72rem;
+  font-weight: 750;
+  text-decoration: none;
+  text-transform: uppercase;
 }
 
 .lightbox {
@@ -1356,6 +1563,10 @@ a:focus-visible {
     grid-template-columns: 1.3fr 0.7fr;
     align-items: end;
   }
+
+  .gallery-page-meta {
+    grid-template-columns: 1fr auto;
+  }
 }
 
 @media (min-width: 1024px) {
@@ -1388,7 +1599,12 @@ a:focus-visible {
 
   .gallery-wall {
     columns: 3;
-    column-gap: 1.25rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  .gallery-wall {
+    columns: 4;
   }
 }
 
