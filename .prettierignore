@@ -2,4 +2,4 @@
 coverage
 node_modules
 package-lock.json
-project-documents/PRD.md
+docs/PRD.md

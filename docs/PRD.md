@@ -1557,7 +1557,7 @@ The provided palette image should also be retained in the project as a visual re
 Suggested project location:
 
 ```text
-project-documents/
+docs/
 ├── PRD.md
 └── references/
     └── wedding-color-palette.jpg
@@ -2024,7 +2024,7 @@ types/
 
 public/
 
-project-documents/
+docs/
   PRD.md
   references/
     wedding-color-palette.jpg

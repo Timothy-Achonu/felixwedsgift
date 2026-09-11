@@ -1,6 +1,6 @@
 # Felix & Gift Wedding Website
 
-The Next.js foundation for Felix and Gift's wedding website. Product requirements and phased delivery guidance live in [project-documents/PRD.md](project-documents/PRD.md), with palette roles and accessibility guidance in [project-documents/PALETTE.md](project-documents/PALETTE.md).
+The Next.js foundation for Felix and Gift's wedding website. Product requirements and phased delivery guidance live in [docs/PRD.md](docs/PRD.md), with palette roles and accessibility guidance in [docs/PALETTE.md](docs/PALETTE.md).
 
 ## Current Phase
 
