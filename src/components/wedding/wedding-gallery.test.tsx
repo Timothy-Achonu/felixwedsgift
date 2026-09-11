@@ -16,12 +16,12 @@ const photos: WeddingPhoto[] = Array.from({ length: 6 }, (_, index) => ({
 describe("wedding gallery", () => {
   beforeEach(() => {
     vi.spyOn(HTMLDialogElement.prototype, "showModal").mockImplementation(
-      function () {
+      function (this: HTMLDialogElement) {
         this.setAttribute("open", "");
       },
     );
     vi.spyOn(HTMLDialogElement.prototype, "close").mockImplementation(
-      function () {
+      function (this: HTMLDialogElement) {
         this.removeAttribute("open");
       },
     );
