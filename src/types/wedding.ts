@@ -18,7 +18,7 @@ export type ScheduleItem = {
 };
 
 export type WeddingContent = {
-  isMock: true;
+  isMock: boolean;
   couple: {
     partnerOne: string;
     partnerTwo: string;
@@ -32,6 +32,7 @@ export type WeddingContent = {
     image: WeddingPhoto;
   };
   story: {
+    heading: string;
     introduction: string;
     body: string;
     images: [WeddingPhoto, WeddingPhoto];

@@ -1628,3 +1628,504 @@ a:focus-visible {
     transform: none;
   }
 }
+
+/* Admin authentication and workspace */
+.admin-auth-page,
+.admin-page {
+  min-height: 100vh;
+  background: var(--wedding-cream);
+  color: var(--wedding-navy);
+}
+
+.admin-auth-page {
+  display: grid;
+  min-height: 100svh;
+  place-items: center;
+  padding: 1.25rem;
+  background:
+    radial-gradient(
+      circle at 15% 15%,
+      rgb(102 152 211 / 24%),
+      transparent 26rem
+    ),
+    var(--wedding-cream);
+}
+
+.admin-auth-panel {
+  width: min(100%, 31rem);
+  border: 1px solid rgb(0 3 48 / 16%);
+  padding: clamp(2rem, 8vw, 4.5rem);
+  background: rgb(250 229 198 / 82%);
+  box-shadow: 1rem 1rem 0 rgb(66 28 15 / 10%);
+}
+
+.admin-mark {
+  margin: 0 0 3.5rem;
+  color: var(--wedding-brown);
+  font-size: 3rem;
+  line-height: 1;
+}
+
+.admin-mark span,
+.admin-brand-monogram em {
+  color: var(--wedding-blue);
+  font-style: italic;
+}
+
+.admin-eyebrow {
+  margin: 0;
+  color: var(--wedding-brown);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.admin-auth-panel h1 {
+  margin: 0.75rem 0 1rem;
+  font-size: clamp(3rem, 12vw, 5rem);
+  font-weight: 500;
+  letter-spacing: -0.04em;
+  line-height: 0.9;
+}
+
+.admin-auth-intro {
+  max-width: 25rem;
+  margin: 0 0 2.5rem;
+  color: rgb(0 3 48 / 72%);
+  font-size: 0.88rem;
+  line-height: 1.7;
+}
+
+.admin-login-form {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.admin-login-form label {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.admin-login-form label span {
+  color: var(--wedding-brown);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.admin-login-form input {
+  width: 100%;
+  border: 1px solid rgb(0 3 48 / 28%);
+  border-radius: 0;
+  padding: 0.85rem 0.9rem;
+  background: rgb(250 229 198 / 50%);
+  color: var(--wedding-navy);
+}
+
+.admin-login-form input:focus {
+  border-color: var(--wedding-navy);
+  outline: 2px solid var(--wedding-blue);
+  outline-offset: 2px;
+}
+
+.admin-form-error {
+  min-height: 1.25rem;
+  margin: 0;
+  color: var(--wedding-brown);
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
+.admin-primary-button,
+.admin-logout-button {
+  border: 1px solid var(--wedding-navy);
+  border-radius: 0;
+  cursor: pointer;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transition:
+    background-color 180ms ease,
+    color 180ms ease;
+}
+
+.admin-primary-button {
+  padding: 0.95rem 1rem;
+  background: var(--wedding-navy);
+  color: var(--wedding-cream);
+}
+
+.admin-primary-button:hover:not(:disabled),
+.admin-primary-button:focus-visible {
+  background: var(--wedding-brown);
+}
+
+.admin-primary-button:disabled {
+  cursor: wait;
+  opacity: 0.6;
+}
+
+.admin-setup-notice {
+  display: grid;
+  gap: 0.5rem;
+  border-left: 3px solid var(--wedding-blue);
+  padding: 0.9rem 1rem;
+  background: rgb(0 3 48 / 7%);
+  font-size: 0.78rem;
+  line-height: 1.6;
+}
+
+.admin-setup-notice strong {
+  color: var(--wedding-brown);
+}
+
+.admin-back-link,
+.admin-return-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--wedding-brown);
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.admin-back-link {
+  margin-top: 2rem;
+}
+
+.admin-back-link:hover,
+.admin-return-link:hover {
+  color: var(--wedding-navy);
+  text-decoration: underline;
+  text-underline-offset: 0.25rem;
+}
+
+.admin-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  border-bottom: 1px solid rgb(0 3 48 / 14%);
+  padding: 1rem 1.25rem;
+}
+
+.admin-brand {
+  display: inline-flex;
+  flex-direction: column;
+  color: inherit;
+  text-decoration: none;
+}
+
+.admin-brand-monogram {
+  font-size: 1.7rem;
+  line-height: 0.9;
+}
+
+.admin-brand-label {
+  margin-top: 0.35rem;
+  color: var(--wedding-brown);
+  font-size: 0.58rem;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.admin-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.admin-user {
+  max-width: 15rem;
+  overflow: hidden;
+  color: rgb(0 3 48 / 64%);
+  font-size: 0.72rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-logout-button {
+  padding: 0.65rem 0.8rem;
+  background: transparent;
+  color: var(--wedding-navy);
+}
+
+.admin-logout-button:hover,
+.admin-logout-button:focus-visible {
+  background: var(--wedding-navy);
+  color: var(--wedding-cream);
+}
+
+.admin-shell {
+  display: grid;
+  min-height: calc(100vh - 5.1rem);
+}
+
+.admin-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  border-bottom: 1px solid rgb(0 3 48 / 14%);
+  padding: 1.25rem;
+}
+
+.admin-sidebar nav {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+}
+
+.admin-nav-link {
+  flex: 0 0 auto;
+  padding: 0.55rem 0.7rem;
+  color: var(--wedding-brown);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.admin-nav-link.is-active {
+  background: var(--wedding-navy);
+  color: var(--wedding-cream);
+}
+
+.admin-nav-link.is-disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.admin-return-link {
+  margin-top: auto;
+}
+
+.admin-content {
+  width: min(100%, 76rem);
+  padding: clamp(2.5rem, 7vw, 6rem) 1.25rem;
+}
+
+.admin-content-intro {
+  max-width: 45rem;
+}
+
+.admin-content-intro h1 {
+  margin: 1rem 0 1.5rem;
+  font-size: clamp(3.5rem, 11vw, 7.5rem);
+  font-weight: 500;
+  letter-spacing: -0.05em;
+  line-height: 0.86;
+}
+
+.admin-content-intro > p:last-child {
+  max-width: 32rem;
+  margin: 0;
+  color: rgb(0 3 48 / 68%);
+  font-size: 0.9rem;
+  line-height: 1.75;
+}
+
+.admin-module-grid {
+  display: grid;
+  gap: 1rem;
+  margin-top: 4rem;
+}
+
+.admin-module-card {
+  min-height: 15rem;
+  border: 1px solid rgb(0 3 48 / 16%);
+  padding: 1.25rem;
+  background: rgb(250 229 198 / 52%);
+}
+
+.admin-module-card > svg {
+  margin-bottom: 2.5rem;
+  color: var(--wedding-blue);
+}
+
+.admin-module-card h2 {
+  margin: 0.55rem 0 0.75rem;
+  color: var(--wedding-brown);
+  font-size: 2rem;
+  font-weight: 500;
+  line-height: 1;
+}
+
+.admin-module-card > p:last-child {
+  max-width: 18rem;
+  margin: 0;
+  color: rgb(0 3 48 / 64%);
+  font-size: 0.8rem;
+  line-height: 1.6;
+}
+
+.admin-card-link {
+  display: inline-block;
+  margin-top: 1.25rem;
+  color: var(--wedding-navy);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-decoration: underline;
+  text-underline-offset: 0.25rem;
+  text-transform: uppercase;
+}
+
+.admin-form-content {
+  max-width: 78rem;
+}
+
+.admin-page-error {
+  max-width: 38rem;
+  margin-top: 3rem;
+}
+
+.admin-save-confirmation {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 2.5rem 0 -1rem;
+  color: #356b4b;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.admin-settings-form {
+  margin-top: 3rem;
+}
+
+.admin-form-section {
+  border-top: 1px solid rgb(0 3 48 / 16%);
+  padding: 1.5rem 0 2rem;
+}
+
+.admin-form-grid {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.admin-form-grid-wide {
+  max-width: 54rem;
+}
+
+.admin-settings-form label {
+  display: grid;
+  gap: 0.45rem;
+  color: var(--wedding-brown);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.admin-settings-form input,
+.admin-settings-form textarea {
+  width: 100%;
+  border: 1px solid rgb(0 3 48 / 18%);
+  border-radius: 0;
+  padding: 0.8rem 0.85rem;
+  background: rgb(255 247 232 / 52%);
+  color: var(--wedding-navy);
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 500;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+.admin-settings-form textarea {
+  resize: vertical;
+}
+
+.admin-settings-form input:focus,
+.admin-settings-form textarea:focus {
+  border-color: var(--wedding-blue);
+  outline: 2px solid rgb(107 174 236 / 28%);
+  outline-offset: 1px;
+}
+
+.admin-field-wide {
+  grid-column: 1 / -1;
+}
+
+.admin-form-footer {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem 2rem;
+  border-top: 1px solid rgb(0 3 48 / 16%);
+  padding: 1.5rem 0 3rem;
+}
+
+.admin-publish-toggle {
+  display: flex !important;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 0.6rem !important;
+  color: var(--wedding-navy) !important;
+  font-size: 0.75rem !important;
+  letter-spacing: normal !important;
+  text-transform: none !important;
+}
+
+.admin-publish-toggle input {
+  width: 1rem;
+  height: 1rem;
+  accent-color: var(--wedding-navy);
+}
+
+.admin-form-error {
+  margin: 0;
+  color: #a13d28;
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
+.admin-honesty-note {
+  max-width: 35rem;
+  margin: 2rem 0 0;
+  color: rgb(66 28 15 / 78%);
+  font-size: 0.72rem;
+  line-height: 1.7;
+}
+
+@media (min-width: 768px) {
+  .admin-header {
+    padding-inline: 2rem;
+  }
+
+  .admin-shell {
+    grid-template-columns: 15rem 1fr;
+  }
+
+  .admin-sidebar {
+    border-right: 1px solid rgb(0 3 48 / 14%);
+    border-bottom: 0;
+    padding: 2rem 1.25rem;
+  }
+
+  .admin-sidebar nav {
+    display: grid;
+    overflow: visible;
+  }
+
+  .admin-content {
+    padding-inline: clamp(2rem, 7vw, 7rem);
+  }
+
+  .admin-module-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .admin-form-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

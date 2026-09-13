@@ -4,7 +4,7 @@ import Link from "next/link";
 
 import { SiteHeader } from "@/components/wedding/site-header";
 import { WeddingGallery } from "@/components/wedding/wedding-gallery";
-import { getWeddingContent } from "@/data/mock-wedding";
+import { getWeddingContent } from "@/data/wedding";
 
 export const metadata: Metadata = {
   title: "Wedding Gallery | Felix & Gift",

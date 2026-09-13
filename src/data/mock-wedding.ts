@@ -85,6 +85,7 @@ export const mockWeddingContent = {
     image: photos.hero,
   },
   story: {
+    heading: "We found home in each other.",
     introduction:
       "Two lives, one unfolding story, and a celebration made brighter by the people we love.",
     body: "What began in the ordinary became something we could not imagine living without. Through every season, laughter has been our rhythm and friendship our home. This December, we begin our next chapter surrounded by the family and friends who helped us get here.",

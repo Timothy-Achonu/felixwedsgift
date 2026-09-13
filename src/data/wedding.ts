@@ -1,0 +1,122 @@
+import type { WeddingContent } from "@/types/wedding";
+
+import { isSupabaseConfigured } from "@/lib/supabase/config";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
+
+import { mockWeddingContent } from "./mock-wedding";
+
+type WeddingSettingsRow = {
+  partner_one_name: string;
+  partner_two_name: string;
+  wedding_date: string;
+  timezone: string;
+  ceremony_time: string;
+  reception_time: string;
+  venue_name: string;
+  venue_address: string;
+  dress_code: string;
+  directions_url: string;
+  hero_eyebrow: string;
+  hero_message: string;
+  story_heading: string;
+  story_introduction: string;
+  story_body: string;
+};
+
+type ScheduleItemRow = {
+  id: string;
+  time_label: string;
+  title: string;
+  description: string | null;
+};
+
+function formatWeddingDate(date: string, timezone: string) {
+  return new Intl.DateTimeFormat("en-GB", {
+    day: "numeric",
+    month: "long",
+    timeZone: timezone,
+    year: "numeric",
+  }).format(new Date(date));
+}
+
+export async function getWeddingContent(): Promise<WeddingContent> {
+  if (!isSupabaseConfigured()) {
+    return mockWeddingContent;
+  }
+
+  const supabase = await createSupabaseServerClient();
+  const { data: settings, error: settingsError } = await supabase
+    .from("wedding_settings")
+    .select(
+      "partner_one_name, partner_two_name, wedding_date, timezone, ceremony_time, reception_time, venue_name, venue_address, dress_code, directions_url, hero_eyebrow, hero_message, story_heading, story_introduction, story_body",
+    )
+    .eq("id", 1)
+    .eq("is_published", true)
+    .maybeSingle<WeddingSettingsRow>();
+
+  if (settingsError) {
+    throw new Error("Unable to load published wedding settings.", {
+      cause: settingsError,
+    });
+  }
+
+  if (!settings) {
+    throw new Error(
+      "No published wedding settings found. Apply the Supabase seed or publish wedding settings from the admin area.",
+    );
+  }
+
+  const { data: schedule, error: scheduleError } = await supabase
+    .from("schedule_items")
+    .select("id, time_label, title, description")
+    .order("sort_order", { ascending: true })
+    .order("created_at", { ascending: true })
+    .returns<ScheduleItemRow[]>();
+
+  if (scheduleError) {
+    throw new Error("Unable to load the wedding schedule.", {
+      cause: scheduleError,
+    });
+  }
+
+  return {
+    ...mockWeddingContent,
+    isMock: false,
+    couple: {
+      partnerOne: settings.partner_one_name,
+      partnerTwo: settings.partner_two_name,
+    },
+    weddingDate: settings.wedding_date,
+    weddingDateLabel: formatWeddingDate(
+      settings.wedding_date,
+      settings.timezone,
+    ),
+    timezone: settings.timezone,
+    hero: {
+      ...mockWeddingContent.hero,
+      eyebrow: settings.hero_eyebrow,
+      message: settings.hero_message,
+    },
+    story: {
+      ...mockWeddingContent.story,
+      heading: settings.story_heading,
+      introduction: settings.story_introduction,
+      body: settings.story_body,
+    },
+    details: {
+      ...mockWeddingContent.details,
+      ceremonyTime: settings.ceremony_time,
+      receptionTime: settings.reception_time,
+      venueName: settings.venue_name,
+      venueAddress: settings.venue_address,
+      dressCode: settings.dress_code,
+      directionsUrl: settings.directions_url,
+    },
+    schedule: (schedule ?? []).map((item) => ({
+      id: item.id,
+      time: item.time_label,
+      title: item.title,
+      ...(item.description ? { description: item.description } : {}),
+    })),
+  };
+}

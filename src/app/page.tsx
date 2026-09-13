@@ -13,7 +13,7 @@ import { PhotoUploadDemo } from "@/components/wedding/photo-upload-demo";
 import { Reveal } from "@/components/wedding/reveal";
 import { SiteHeader } from "@/components/wedding/site-header";
 import { WeddingGallery } from "@/components/wedding/wedding-gallery";
-import { getWeddingContent } from "@/data/mock-wedding";
+import { getWeddingContent } from "@/data/wedding";
 
 export default async function Home() {
   const wedding = await getWeddingContent();
@@ -56,7 +56,9 @@ export default async function Home() {
           <div className="hero-details hero-reveal hero-reveal-five">
             <p>{wedding.hero.message}</p>
             <span aria-hidden="true" />
-            <time dateTime="2026-12-18">{wedding.weddingDateLabel}</time>
+            <time dateTime={wedding.weddingDate}>
+              {wedding.weddingDateLabel}
+            </time>
             <span aria-hidden="true" />
             <p>{wedding.details.venueAddress}</p>
           </div>
@@ -89,7 +91,7 @@ export default async function Home() {
           <Reveal className="story-copy">
             <p className="eyebrow">Our story</p>
             <h2 id="story-heading" className="section-title font-display">
-              We found home in each other.
+              {wedding.story.heading}
             </h2>
             <p className="story-lead">{wedding.story.introduction}</p>
             <p className="story-body">{wedding.story.body}</p>
