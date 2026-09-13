@@ -7,3 +7,15 @@ This version has breaking changes — APIs, conventions, and file structure may 
 This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
 
 <!-- END:nextjs-agent-rules -->
+
+# Felix & Gift agent guide
+
+Before implementing or refactoring application code in this repository, read
+[`.cursor/skills/code-pattern/SKILL.md`](.cursor/skills/code-pattern/SKILL.md)
+(with the Read tool, not from memory) and apply its principles and project
+rules where they fit the task.
+
+## Files and organization
+
+- Do not place `"use client"` in `page.tsx`; keep route page files server
+  components and move interactive logic into colocated client components.
