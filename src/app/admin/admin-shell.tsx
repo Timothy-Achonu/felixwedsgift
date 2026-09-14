@@ -48,6 +48,7 @@ export async function AdminShell({
             <Link
               className={`${adminStyles.navLink} ${activeSection === "overview" ? adminStyles.navActive : ""}`}
               href="/admin"
+              aria-current={activeSection === "overview" ? "page" : undefined}
             >
               Overview
             </Link>
@@ -59,12 +60,14 @@ export async function AdminShell({
             <Link
               className={`${adminStyles.navLink} ${activeSection === "details" ? adminStyles.navActive : ""}`}
               href="/admin/details"
+              aria-current={activeSection === "details" ? "page" : undefined}
             >
               Wedding details
             </Link>
             <Link
               className={`${adminStyles.navLink} ${activeSection === "schedule" ? adminStyles.navActive : ""}`}
               href="/admin/schedule"
+              aria-current={activeSection === "schedule" ? "page" : undefined}
             >
               Schedule
             </Link>

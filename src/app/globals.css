@@ -28,6 +28,7 @@
   --color-admin-focus: var(--admin-focus);
   --font-sans: var(--font-body);
   --font-display: var(--font-display);
+  --breakpoint-phone: 360px;
 }
 
 @layer base {
