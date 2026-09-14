@@ -7,6 +7,10 @@ import {
   type WeddingSettingsActionState,
 } from "../actions";
 import { adminStyles } from "../admin-styles";
+import {
+  AdminTimeSelect,
+  WeddingDateTimeField,
+} from "../fields/date-time-picker";
 
 export type WeddingSettingsFormValues = {
   partner_one_name: string;
@@ -32,10 +36,6 @@ type Props = {
 };
 
 const initialState: WeddingSettingsActionState = {};
-
-function inputDate(value?: string) {
-  return value ? new Date(value).toISOString().slice(0, 16) : "";
-}
 
 export function WeddingSettingsForm({ settings }: Props) {
   const [state, formAction, isPending] = useActionState(
@@ -72,11 +72,9 @@ export function WeddingSettingsForm({ settings }: Props) {
         <div className={adminStyles.formGrid}>
           <label>
             <span>Wedding date and time</span>
-            <input
+            <WeddingDateTimeField
               name="wedding_date"
-              type="datetime-local"
-              defaultValue={inputDate(settings?.wedding_date)}
-              required
+              value={settings?.wedding_date}
             />
           </label>
           <label>
@@ -89,20 +87,18 @@ export function WeddingSettingsForm({ settings }: Props) {
           </label>
           <label>
             <span>Ceremony time</span>
-            <input
+            <AdminTimeSelect
               name="ceremony_time"
               defaultValue={settings?.ceremony_time}
-              placeholder="2:00 PM"
-              required
+              placeholder="Select time"
             />
           </label>
           <label>
             <span>Reception time</span>
-            <input
+            <AdminTimeSelect
               name="reception_time"
               defaultValue={settings?.reception_time}
-              placeholder="5:00 PM"
-              required
+              placeholder="Select time"
             />
           </label>
           <label>

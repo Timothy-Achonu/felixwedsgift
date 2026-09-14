@@ -4,6 +4,7 @@ import { useActionState } from "react";
 
 import { saveScheduleItem } from "../actions";
 import { adminStyles } from "../admin-styles";
+import { AdminTimeSelect } from "../fields/date-time-picker";
 
 export type ScheduleItemFormValues = {
   time_label: string;
@@ -25,11 +26,10 @@ export function ScheduleItemForm({
       <div className={adminStyles.formGrid}>
         <label>
           <span>Time</span>
-          <input
+          <AdminTimeSelect
             name="time_label"
             defaultValue={item?.time_label}
-            placeholder="2:00 PM"
-            required
+            placeholder="Select time"
           />
         </label>
         <label>

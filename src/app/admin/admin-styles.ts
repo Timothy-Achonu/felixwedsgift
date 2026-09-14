@@ -36,7 +36,7 @@ export const adminStyles = {
     "cursor-pointer rounded-none border border-wedding-navy bg-transparent px-[0.8rem] py-[0.65rem] text-[0.72rem] font-extrabold tracking-[0.08em] text-wedding-navy uppercase transition-colors duration-180 hover:bg-wedding-navy hover:text-wedding-cream focus-visible:bg-wedding-navy focus-visible:text-wedding-cream",
   shell: "grid min-h-[calc(100vh-5.1rem)] md:grid-cols-[15rem_1fr]",
   sidebar:
-    "flex flex-col gap-4 border-b border-wedding-navy/14 p-5 md:border-r md:border-b-0 md:px-5 md:py-8",
+    "flex flex-col gap-4 border-b border-wedding-navy/14 p-5 md:sticky md:top-0 md:h-[calc(100vh-5.1rem)] md:self-start md:overflow-y-auto md:border-r md:border-b-0 md:px-5 md:py-8",
   sidebarNav: "flex gap-2 overflow-x-auto md:grid md:overflow-visible",
   navLink:
     "shrink-0 px-[0.7rem] py-[0.55rem] text-[0.68rem] font-extrabold tracking-[0.06em] text-wedding-brown no-underline uppercase",
@@ -89,6 +89,41 @@ export const adminStyles = {
     "mt-12 border border-dashed border-wedding-navy/24 p-8 text-sm leading-7 text-wedding-navy/68",
   scheduleActions:
     "flex flex-wrap items-center justify-between gap-4 border-t border-wedding-navy/12 pt-4",
+  pickerField: "relative min-w-0",
+  pickerTrigger:
+    "flex min-h-[2.75rem] w-full cursor-pointer items-center gap-2 rounded-none border border-wedding-navy/18 bg-admin-field-surface/52 px-[0.85rem] py-[0.8rem] text-left text-[0.85rem] font-medium normal-case text-wedding-navy transition-colors hover:border-wedding-blue focus-visible:border-wedding-blue focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-admin-focus/28",
+  pickerTriggerPlaceholder: "text-wedding-navy/48",
+  pickerChevron: "ml-auto shrink-0 text-wedding-navy/54",
+  datePopover:
+    "absolute top-full left-0 z-50 mt-2 w-[min(21rem,calc(100vw-2.5rem))] overflow-hidden border border-wedding-navy/18 bg-wedding-cream p-4 text-wedding-navy shadow-[0.7rem_0.7rem_0_rgb(66_28_15/10%)]",
+  timePopover:
+    "absolute top-full left-0 z-50 mt-2 max-h-64 w-full min-w-44 overflow-y-auto border border-wedding-navy/18 bg-wedding-cream p-1 shadow-[0.7rem_0.7rem_0_rgb(66_28_15/10%)]",
+  dateHeader: "flex items-center justify-between gap-2",
+  dateHeadingControls: "flex min-w-0 items-center justify-center gap-1",
+  dateMonthLabel:
+    "wedding-display truncate text-lg font-medium text-wedding-brown",
+  dateYearSelect:
+    "cursor-pointer border-0 bg-transparent px-1 py-1 text-sm font-bold text-wedding-brown outline-none focus-visible:outline-2 focus-visible:outline-wedding-blue",
+  pickerIconButton:
+    "inline-flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-none border border-transparent text-wedding-navy transition-colors hover:border-wedding-navy/18 hover:bg-wedding-paper focus-visible:border-wedding-blue focus-visible:outline-2 focus-visible:outline-wedding-blue",
+  dateWeekdays:
+    "mt-4 grid grid-cols-7 text-center text-[0.62rem] font-extrabold tracking-[0.08em] text-wedding-brown uppercase",
+  dateGrid: "mt-2 grid grid-cols-7 gap-1",
+  dateDay:
+    "aspect-square cursor-pointer rounded-full border border-transparent text-sm text-wedding-navy transition-colors hover:bg-wedding-paper focus-visible:border-wedding-blue focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-wedding-blue",
+  dateDaySelected:
+    "bg-wedding-navy font-bold !text-wedding-cream hover:bg-wedding-brown",
+  dateDayToday: "border-wedding-blue font-bold text-wedding-brown",
+  pickerFooter:
+    "mt-4 grid grid-cols-2 gap-3 border-t border-wedding-navy/14 pt-4",
+  pickerCancel:
+    "cursor-pointer border border-wedding-navy/20 bg-transparent px-3 py-2 text-[0.68rem] font-extrabold tracking-[0.06em] text-wedding-navy uppercase transition-colors hover:bg-wedding-paper focus-visible:outline-2 focus-visible:outline-wedding-blue",
+  pickerApply:
+    "cursor-pointer border border-wedding-navy bg-wedding-navy px-3 py-2 text-[0.68rem] font-extrabold tracking-[0.06em] text-wedding-cream uppercase transition-colors hover:bg-wedding-brown focus-visible:outline-2 focus-visible:outline-wedding-blue disabled:cursor-not-allowed disabled:opacity-45",
+  timeOption:
+    "block w-full cursor-pointer px-3 py-2 text-left text-sm text-wedding-navy transition-colors hover:bg-wedding-paper focus-visible:bg-wedding-paper focus-visible:outline-none",
+  timeOptionSelected: "bg-wedding-navy/8 font-bold text-wedding-brown",
+  dateTimeField: "grid gap-3 sm:grid-cols-2",
   dangerButton:
     "cursor-pointer border-0 bg-transparent p-0 text-xs font-extrabold tracking-[0.05em] text-status-error uppercase underline underline-offset-4",
   secondaryButton:
