@@ -16,6 +16,7 @@ insert into public.wedding_settings (
   story_heading,
   story_introduction,
   story_body,
+  details_heading,
   is_published
 )
 values (
@@ -35,6 +36,7 @@ values (
   'We found home in each other.',
   'Two lives, one unfolding story, and a celebration made brighter by the people we love.',
   'What began in the ordinary became something we could not imagine living without. Through every season, laughter has been our rhythm and friendship our home. This December, we begin our next chapter surrounded by the family and friends who helped us get here.',
+  'Meet us in Lagos',
   true
 )
 on conflict (id) do update set
@@ -53,6 +55,7 @@ on conflict (id) do update set
   story_heading = excluded.story_heading,
   story_introduction = excluded.story_introduction,
   story_body = excluded.story_body,
+  details_heading = excluded.details_heading,
   is_published = excluded.is_published,
   updated_at = now();
 

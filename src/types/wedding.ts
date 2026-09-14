@@ -38,6 +38,7 @@ export type WeddingContent = {
     images: [WeddingPhoto, WeddingPhoto];
   };
   details: {
+    heading: string;
     ceremonyTime: string;
     receptionTime: string;
     venueName: string;

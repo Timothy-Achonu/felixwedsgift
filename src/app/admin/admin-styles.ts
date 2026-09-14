@@ -75,4 +75,21 @@ export const adminStyles = {
   publishToggle:
     "flex! grid-cols-[auto_1fr] items-center gap-[0.6rem]! text-xs! tracking-normal! text-wedding-navy! normal-case!",
   publishCheckbox: "size-4! accent-wedding-navy",
+  scheduleIntro: "flex flex-wrap items-end justify-between gap-6",
+  scheduleList: "mt-12 grid gap-4",
+  scheduleCard: "border border-wedding-navy/16 bg-wedding-cream/52 p-5 md:p-6",
+  scheduleCardHeader: "flex items-start justify-between gap-4",
+  scheduleNumber: "wedding-display text-3xl leading-none text-wedding-blue",
+  scheduleControls: "flex items-center gap-2",
+  iconButton:
+    "inline-flex size-9 cursor-pointer items-center justify-center rounded-none border border-wedding-navy/22 bg-transparent text-wedding-navy transition-colors duration-180 hover:bg-wedding-navy hover:text-wedding-cream focus-visible:bg-wedding-navy focus-visible:text-wedding-cream disabled:cursor-not-allowed disabled:opacity-30",
+  scheduleForm: "mt-6 grid gap-4 border-t border-wedding-navy/12 pt-5",
+  scheduleEmpty:
+    "mt-12 border border-dashed border-wedding-navy/24 p-8 text-sm leading-7 text-wedding-navy/68",
+  scheduleActions:
+    "flex flex-wrap items-center justify-between gap-4 border-t border-wedding-navy/12 pt-4",
+  dangerButton:
+    "cursor-pointer border-0 bg-transparent p-0 text-xs font-extrabold tracking-[0.05em] text-status-error uppercase underline underline-offset-4",
+  secondaryButton:
+    "cursor-pointer rounded-none border border-wedding-navy/24 bg-transparent px-4 py-3 text-xs font-extrabold tracking-[0.06em] text-wedding-navy uppercase transition-colors duration-180 hover:bg-wedding-navy hover:text-wedding-cream focus-visible:bg-wedding-navy focus-visible:text-wedding-cream disabled:cursor-wait disabled:opacity-60",
 } as const;

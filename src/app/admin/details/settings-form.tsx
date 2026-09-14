@@ -24,6 +24,7 @@ export type WeddingSettingsFormValues = {
   story_heading: string;
   story_introduction: string;
   story_body: string;
+  details_heading: string;
 };
 
 type Props = {
@@ -143,6 +144,14 @@ export function WeddingSettingsForm({ settings }: Props) {
       <div className={adminStyles.formSection}>
         <p className={adminStyles.eyebrow}>Public copy</p>
         <div className={`${adminStyles.formGrid} ${adminStyles.formGridWide}`}>
+          <label>
+            <span>Details heading</span>
+            <input
+              name="details_heading"
+              defaultValue={settings?.details_heading ?? "Meet us in Lagos"}
+              required
+            />
+          </label>
           <label>
             <span>Hero eyebrow</span>
             <input

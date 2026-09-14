@@ -92,6 +92,7 @@ export const mockWeddingContent = {
     images: [photos.portrait, photos.rings],
   },
   details: {
+    heading: "Meet us in Lagos",
     ceremonyTime: "2:00 PM",
     receptionTime: "4:30 PM",
     venueName: "The Garden Estate",

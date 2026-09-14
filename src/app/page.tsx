@@ -160,7 +160,7 @@ export default async function Home() {
               id="details-heading"
               className="section-title wedding-display mt-[0.8rem] mb-4"
             >
-              Meet us in Lagos
+              {wedding.details.heading}
             </h2>
             <p className="text-wedding-brown m-0 text-[0.82rem] font-bold uppercase">
               Friday / {wedding.weddingDateLabel}

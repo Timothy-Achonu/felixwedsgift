@@ -21,6 +21,7 @@ type WeddingSettingsRow = {
   story_heading: string;
   story_introduction: string;
   story_body: string;
+  details_heading: string;
 };
 
 type ScheduleItemRow = {
@@ -48,7 +49,7 @@ export async function getWeddingContent(): Promise<WeddingContent> {
   const { data: settings, error: settingsError } = await supabase
     .from("wedding_settings")
     .select(
-      "partner_one_name, partner_two_name, wedding_date, timezone, ceremony_time, reception_time, venue_name, venue_address, dress_code, directions_url, hero_eyebrow, hero_message, story_heading, story_introduction, story_body",
+      "partner_one_name, partner_two_name, wedding_date, timezone, ceremony_time, reception_time, venue_name, venue_address, dress_code, directions_url, hero_eyebrow, hero_message, story_heading, story_introduction, story_body, details_heading",
     )
     .eq("id", 1)
     .eq("is_published", true)
@@ -105,6 +106,7 @@ export async function getWeddingContent(): Promise<WeddingContent> {
     },
     details: {
       ...mockWeddingContent.details,
+      heading: settings.details_heading,
       ceremonyTime: settings.ceremony_time,
       receptionTime: settings.reception_time,
       venueName: settings.venue_name,

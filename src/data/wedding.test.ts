@@ -58,6 +58,7 @@ describe("wedding content adapter", () => {
         story_heading: "We found home in each other.",
         story_introduction: "An introduction.",
         story_body: "A story.",
+        details_heading: "Join us in Lagos",
       },
       error: null,
     });
@@ -87,6 +88,7 @@ describe("wedding content adapter", () => {
     expect(wedding.isMock).toBe(false);
     expect(wedding.weddingDateLabel).toBe("18 December 2026");
     expect(wedding.story.heading).toBe("We found home in each other.");
+    expect(wedding.details.heading).toBe("Join us in Lagos");
     expect(wedding.schedule).toEqual([
       {
         id: "schedule-1",
