@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 
+import { adminStyles } from "../admin-styles";
+
 export function AdminLoginForm() {
   const router = useRouter();
   const [email, setEmail] = useState("");
@@ -39,10 +41,11 @@ export function AdminLoginForm() {
   }
 
   return (
-    <form className="admin-login-form" onSubmit={handleSubmit}>
-      <label>
-        <span>Email address</span>
+    <form className={adminStyles.loginForm} onSubmit={handleSubmit}>
+      <label className={adminStyles.fieldLabel}>
+        <span className={adminStyles.fieldLabelText}>Email address</span>
         <input
+          className={adminStyles.loginInput}
           autoComplete="email"
           name="email"
           onChange={(event) => setEmail(event.target.value)}
@@ -51,9 +54,10 @@ export function AdminLoginForm() {
           value={email}
         />
       </label>
-      <label>
-        <span>Password</span>
+      <label className={adminStyles.fieldLabel}>
+        <span className={adminStyles.fieldLabelText}>Password</span>
         <input
+          className={adminStyles.loginInput}
           autoComplete="current-password"
           name="password"
           onChange={(event) => setPassword(event.target.value)}
@@ -62,11 +66,11 @@ export function AdminLoginForm() {
           value={password}
         />
       </label>
-      <p aria-live="polite" className="admin-form-error">
+      <p aria-live="polite" className={adminStyles.formError}>
         {error}
       </p>
       <button
-        className="admin-primary-button"
+        className={adminStyles.primaryButton}
         disabled={isSubmitting}
         type="submit"
       >

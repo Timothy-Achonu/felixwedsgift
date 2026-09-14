@@ -40,6 +40,15 @@ Derived tones may be introduced when a real interface needs surfaces, borders, i
 
 Do not add speculative shade scales. Add the smallest set of derived tokens required by the feature being implemented and document their intended pairings alongside the code change.
 
+The current interface uses these purpose-specific derived tokens:
+
+| Token                   | Value     | Intended role                                       |
+| ----------------------- | --------- | --------------------------------------------------- |
+| `--status-error`        | `#A13D28` | Admin validation and request failure messages       |
+| `--status-success`      | `#356B4B` | Admin save confirmations                            |
+| `--admin-field-surface` | `#FFF7E8` | Translucent admin form-control surfaces             |
+| `--admin-focus`         | `#6BAEEC` | Admin form-control focus outline against warm paper |
+
 ## Reference
 
 - [WCAG 2.2: Understanding Success Criterion 1.4.3, Contrast (Minimum)](https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html)

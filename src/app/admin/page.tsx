@@ -4,6 +4,7 @@ import Link from "next/link";
 import { requireAdmin } from "@/lib/auth/admin";
 
 import { logout } from "./actions";
+import { adminStyles } from "./admin-styles";
 
 const upcomingModules = [
   {
@@ -27,66 +28,86 @@ export default async function AdminPage() {
   const admin = await requireAdmin();
 
   return (
-    <main className="admin-page">
-      <header className="admin-header">
-        <Link className="admin-brand" href="/admin" aria-label="Admin overview">
-          <span className="admin-brand-monogram font-display">
-            F <em>&amp;</em> G
+    <main className={adminStyles.page}>
+      <header className={adminStyles.header}>
+        <Link
+          className={adminStyles.brand}
+          href="/admin"
+          aria-label="Admin overview"
+        >
+          <span className={adminStyles.brandMonogram}>
+            F <em className="text-wedding-blue">&amp;</em> G
           </span>
-          <span className="admin-brand-label">Studio</span>
+          <span className={adminStyles.brandLabel}>Studio</span>
         </Link>
-        <div className="admin-header-actions">
-          <span className="admin-user">{admin.email}</span>
+        <div className={adminStyles.headerActions}>
+          <span className={adminStyles.user}>{admin.email}</span>
           <form action={logout}>
-            <button className="admin-logout-button" type="submit">
+            <button className={adminStyles.logoutButton} type="submit">
               Sign out
             </button>
           </form>
         </div>
       </header>
 
-      <div className="admin-shell">
-        <aside className="admin-sidebar" aria-label="Admin navigation">
-          <p className="admin-eyebrow">Workspace</p>
-          <nav>
-            <Link className="admin-nav-link is-active" href="/admin">
+      <div className={adminStyles.shell}>
+        <aside className={adminStyles.sidebar} aria-label="Admin navigation">
+          <p className={adminStyles.eyebrow}>Workspace</p>
+          <nav className={adminStyles.sidebarNav}>
+            <Link
+              className={`${adminStyles.navLink} ${adminStyles.navActive}`}
+              href="/admin"
+            >
               Overview
             </Link>
-            <span className="admin-nav-link is-disabled">Photos</span>
-            <Link className="admin-nav-link" href="/admin/details">
+            <span
+              className={`${adminStyles.navLink} ${adminStyles.navDisabled}`}
+            >
+              Photos
+            </span>
+            <Link className={adminStyles.navLink} href="/admin/details">
               Wedding details
             </Link>
-            <span className="admin-nav-link is-disabled">Schedule</span>
+            <span
+              className={`${adminStyles.navLink} ${adminStyles.navDisabled}`}
+            >
+              Schedule
+            </span>
           </nav>
-          <Link className="admin-return-link" href="/">
+          <Link className={adminStyles.returnLink} href="/">
             <ArrowLeft aria-hidden="true" size={15} />
             Public website
           </Link>
         </aside>
 
-        <section className="admin-content" aria-labelledby="admin-heading">
-          <div className="admin-content-intro">
-            <p className="admin-eyebrow">The Felix &amp; Gift workspace</p>
-            <h1 id="admin-heading" className="font-display">
+        <section
+          className={adminStyles.content}
+          aria-labelledby="admin-heading"
+        >
+          <div className={adminStyles.contentIntro}>
+            <p className={adminStyles.eyebrow}>
+              The Felix &amp; Gift workspace
+            </p>
+            <h1 id="admin-heading" className={adminStyles.contentHeading}>
               A beautiful day,
               <br />
               thoughtfully held.
             </h1>
-            <p>
+            <p className={adminStyles.contentCopy}>
               Your workspace is ready. The next steps will connect the wedding
               details, schedule, and guest memories to this home.
             </p>
           </div>
 
-          <div className="admin-module-grid">
+          <div className={adminStyles.moduleGrid}>
             {upcomingModules.map(({ icon: Icon, label, description }) => (
-              <article className="admin-module-card" key={label}>
+              <article className={adminStyles.moduleCard} key={label}>
                 <Icon aria-hidden="true" size={22} strokeWidth={1.5} />
-                <p className="admin-eyebrow">Coming next</p>
-                <h2 className="font-display">{label}</h2>
+                <p className={adminStyles.eyebrow}>Coming next</p>
+                <h2 className={adminStyles.moduleHeading}>{label}</h2>
                 <p>{description}</p>
                 {label === "Wedding settings" ? (
-                  <Link className="admin-card-link" href="/admin/details">
+                  <Link className={adminStyles.cardLink} href="/admin/details">
                     Edit wedding details
                   </Link>
                 ) : null}
@@ -94,7 +115,7 @@ export default async function AdminPage() {
             ))}
           </div>
 
-          <p className="admin-honesty-note">
+          <p className={adminStyles.honestyNote}>
             This first shell intentionally shows no sample counts or wedding
             data. Once Supabase content is connected, this overview will reflect
             the live celebration.

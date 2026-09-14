@@ -110,9 +110,9 @@ export function WeddingGallery({ photos, variant }: WeddingGalleryProps) {
 
   if (displayedPhotos.length === 0) {
     return (
-      <div className="gallery-empty">
+      <div className="bg-wedding-paper px-5 py-24 text-center">
         <p className="eyebrow">The wedding album</p>
-        <p className="font-display">
+        <p className="wedding-display mx-auto mt-4 mb-0 max-w-[14ch] text-[clamp(2rem,6vw,4rem)] leading-none">
           The album is waiting for its first memory.
         </p>
       </div>
@@ -124,16 +124,24 @@ export function WeddingGallery({ photos, variant }: WeddingGalleryProps) {
 
     return (
       <figure
-        className={`gallery-item ${
+        className={`m-0 inline-block w-full break-inside-avoid align-top ${
           variant === "carousel"
-            ? `gallery-carousel-item ${isPortrait ? "is-portrait" : "is-landscape"}`
+            ? `h-[clamp(23rem,110vw,34rem)] snap-center ${
+                isPortrait
+                  ? "flex-[0_0_min(82vw,31rem)]"
+                  : "flex-[0_0_min(88vw,46rem)]"
+              }`
             : ""
         }`}
         key={photo.id}
       >
         <button
           type="button"
-          className="gallery-button focus-ring"
+          className={`focus-ring group bg-wedding-mist relative block w-full overflow-hidden border-0 p-0 ${
+            variant === "carousel"
+              ? "h-full"
+              : "focus-visible:z-1 focus-visible:outline-offset-[-4px]"
+          }`}
           aria-label={`Open photo: ${photo.caption}`}
           onClick={() => openPhoto(index)}
         >
@@ -143,6 +151,7 @@ export function WeddingGallery({ photos, variant }: WeddingGalleryProps) {
               alt={photo.alt}
               fill
               sizes="(max-width: 640px) 82vw, (max-width: 1024px) 55vw, 42vw"
+              className="object-cover transition-transform duration-600 ease-[cubic-bezier(0.2,0.7,0.2,1)] group-hover:scale-[1.025]"
             />
           ) : (
             <Image
@@ -151,9 +160,13 @@ export function WeddingGallery({ photos, variant }: WeddingGalleryProps) {
               width={photo.width}
               height={photo.height}
               sizes="(max-width: 639px) 100vw, (max-width: 1023px) 50vw, (max-width: 1279px) 33vw, 25vw"
+              className="block h-auto w-full transition-transform duration-600 ease-[cubic-bezier(0.2,0.7,0.2,1)] group-hover:scale-[1.025]"
             />
           )}
-          <span className="gallery-overlay" aria-hidden="true">
+          <span
+            className="bg-wedding-cream text-wedding-navy absolute right-3 bottom-3 grid size-10 translate-y-2 place-items-center rounded-full opacity-0 transition-[opacity,transform] duration-180 group-hover:translate-y-0 group-hover:opacity-100 group-focus-visible:translate-y-0 group-focus-visible:opacity-100"
+            aria-hidden="true"
+          >
             <Expand className="size-5" />
           </span>
         </button>
@@ -164,21 +177,21 @@ export function WeddingGallery({ photos, variant }: WeddingGalleryProps) {
   return (
     <>
       {variant === "carousel" ? (
-        <div className="gallery-carousel-shell">
+        <div className="relative [--gallery-carousel-gutter:max(1.25rem,calc((100vw-1240px)/2))]">
           <div
             ref={carouselRef}
             id="wedding-gallery-carousel"
-            className="gallery-carousel"
+            className="scrollbar-hide flex snap-x snap-mandatory scroll-px-(--gallery-carousel-gutter) gap-4 overflow-x-auto overscroll-x-contain px-(--gallery-carousel-gutter)"
             role="region"
             aria-label="Wedding album preview"
           >
             {photoItems}
           </div>
           {displayedPhotos.length > 1 ? (
-            <div className="gallery-carousel-controls">
+            <div className="pointer-events-none absolute inset-0 z-1">
               <button
                 type="button"
-                className="gallery-carousel-arrow gallery-carousel-previous focus-ring"
+                className="focus-ring bg-wedding-navy text-wedding-cream hover:not-disabled:bg-wedding-cream hover:not-disabled:text-wedding-navy pointer-events-auto absolute top-1/2 left-[max(calc(env(safe-area-inset-left,0px)+0.75rem),calc(var(--gallery-carousel-gutter)+0.75rem))] z-1 grid size-12 -translate-y-1/2 place-items-center rounded-full border-0 transition-colors duration-180 disabled:invisible"
                 aria-label="Scroll gallery backward"
                 aria-controls="wedding-gallery-carousel"
                 disabled={!canScrollPrevious}
@@ -188,7 +201,7 @@ export function WeddingGallery({ photos, variant }: WeddingGalleryProps) {
               </button>
               <button
                 type="button"
-                className="gallery-carousel-arrow gallery-carousel-next focus-ring"
+                className="focus-ring bg-wedding-navy text-wedding-cream hover:not-disabled:bg-wedding-cream hover:not-disabled:text-wedding-navy pointer-events-auto absolute top-1/2 right-[max(calc(env(safe-area-inset-right,0px)+0.75rem),calc(var(--gallery-carousel-gutter)+0.75rem))] z-1 grid size-12 -translate-y-1/2 place-items-center rounded-full border-0 transition-colors duration-180 disabled:invisible"
                 aria-label="Scroll gallery forward"
                 aria-controls="wedding-gallery-carousel"
                 disabled={!canScrollNext}
@@ -200,12 +213,14 @@ export function WeddingGallery({ photos, variant }: WeddingGalleryProps) {
           ) : null}
         </div>
       ) : (
-        <div className="gallery-wall">{photoItems}</div>
+        <div className="columns-1 gap-0 leading-none sm:columns-2 lg:columns-3 xl:columns-4">
+          {photoItems}
+        </div>
       )}
 
       <dialog
         ref={dialogRef}
-        className="lightbox"
+        className="bg-wedding-navy text-wedding-cream backdrop:bg-wedding-navy/[92%] m-0 h-dvh max-h-none w-screen max-w-none border-0 p-0"
         aria-label="Wedding photograph viewer"
         onClose={() => setActiveIndex(null)}
         onCancel={(event) => {
@@ -235,11 +250,11 @@ export function WeddingGallery({ photos, variant }: WeddingGalleryProps) {
         }}
       >
         {activePhoto ? (
-          <div className="lightbox-content">
+          <div className="grid min-h-full grid-rows-[1fr_auto] px-5 pt-18 pb-5">
             <button
               ref={closeButtonRef}
               type="button"
-              className="lightbox-close focus-ring"
+              className="focus-ring border-wedding-cream/45 bg-wedding-navy/74 text-wedding-cream fixed top-4 right-4 z-2 grid size-11 place-items-center rounded-full border"
               aria-label="Close photograph viewer"
               onClick={closePhoto}
             >
@@ -250,7 +265,7 @@ export function WeddingGallery({ photos, variant }: WeddingGalleryProps) {
               <>
                 <button
                   type="button"
-                  className="lightbox-arrow lightbox-previous focus-ring"
+                  className="focus-ring border-wedding-cream/45 bg-wedding-navy/74 text-wedding-cream hover:bg-wedding-cream hover:text-wedding-navy fixed top-1/2 left-4 z-2 grid size-11 -translate-y-1/2 place-items-center rounded-full border"
                   aria-label="Previous photograph"
                   onClick={showPrevious}
                 >
@@ -259,7 +274,7 @@ export function WeddingGallery({ photos, variant }: WeddingGalleryProps) {
 
                 <button
                   type="button"
-                  className="lightbox-arrow lightbox-next focus-ring"
+                  className="focus-ring border-wedding-cream/45 bg-wedding-navy/74 text-wedding-cream hover:bg-wedding-cream hover:text-wedding-navy fixed top-1/2 right-4 z-2 grid size-11 -translate-y-1/2 place-items-center rounded-full border"
                   aria-label="Next photograph"
                   onClick={showNext}
                 >
@@ -268,7 +283,7 @@ export function WeddingGallery({ photos, variant }: WeddingGalleryProps) {
               </>
             ) : null}
 
-            <div className="lightbox-image">
+            <div className="relative min-h-0 [&_img]:object-contain">
               <Image
                 src={activePhoto.src}
                 alt={activePhoto.alt}
@@ -278,10 +293,14 @@ export function WeddingGallery({ photos, variant }: WeddingGalleryProps) {
               />
             </div>
 
-            <div className="lightbox-caption">
-              <p>{activePhoto.caption}</p>
+            <div className="border-wedding-cream/25 flex flex-wrap justify-between gap-x-8 gap-y-2 border-t pt-4">
+              <p className="font-display m-0 text-[1.2rem] italic">
+                {activePhoto.caption}
+              </p>
               {activePhoto.guestName ? (
-                <span>{activePhoto.guestName}</span>
+                <span className="text-wedding-cream/64 text-[0.72rem]">
+                  {activePhoto.guestName}
+                </span>
               ) : null}
             </div>
           </div>

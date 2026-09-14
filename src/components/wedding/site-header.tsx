@@ -62,14 +62,22 @@ export function SiteHeader() {
       <nav
         id="mobile-navigation"
         aria-label="Mobile navigation"
-        className={`mobile-menu ${menuOpen ? "is-open" : ""}`}
+        className={`bg-wedding-cream text-wedding-navy [&_a]:border-wedding-navy/[14%] absolute top-[4.7rem] right-5 left-5 grid overflow-hidden opacity-0 transition-[max-height,opacity,transform] [transition-duration:250ms,180ms,250ms] [transition-timing-function:ease] [&_a]:border-b [&_a]:px-[1.15rem] [&_a]:py-4 [&_a]:text-[0.85rem] [&_a]:font-bold [&_a]:text-inherit [&_a]:no-underline ${
+          menuOpen
+            ? "border-wedding-navy/20 max-h-96 translate-y-0 border opacity-100"
+            : "max-h-0 -translate-y-3"
+        }`}
       >
         {links.map((link) => (
           <Link key={link.href} href={link.href} onClick={closeMenu}>
             {link.label}
           </Link>
         ))}
-        <Link href="/#share" onClick={closeMenu} className="mobile-menu-share">
+        <Link
+          href="/#share"
+          onClick={closeMenu}
+          className="bg-wedding-blue inline-flex items-center gap-[0.6rem] border-b-0!"
+        >
           <Camera aria-hidden="true" className="size-4" />
           Share photos
         </Link>

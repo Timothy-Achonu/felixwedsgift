@@ -6,6 +6,7 @@ import {
   saveWeddingSettings,
   type WeddingSettingsActionState,
 } from "../actions";
+import { adminStyles } from "../admin-styles";
 
 export type WeddingSettingsFormValues = {
   partner_one_name: string;
@@ -42,10 +43,10 @@ export function WeddingSettingsForm({ settings }: Props) {
   );
 
   return (
-    <form className="admin-settings-form" action={formAction}>
-      <div className="admin-form-section">
-        <p className="admin-eyebrow">The couple</p>
-        <div className="admin-form-grid">
+    <form className={adminStyles.settingsForm} action={formAction}>
+      <div className={adminStyles.formSection}>
+        <p className={adminStyles.eyebrow}>The couple</p>
+        <div className={adminStyles.formGrid}>
           <label>
             <span>Partner one</span>
             <input
@@ -65,9 +66,9 @@ export function WeddingSettingsForm({ settings }: Props) {
         </div>
       </div>
 
-      <div className="admin-form-section">
-        <p className="admin-eyebrow">When and where</p>
-        <div className="admin-form-grid">
+      <div className={adminStyles.formSection}>
+        <p className={adminStyles.eyebrow}>When and where</p>
+        <div className={adminStyles.formGrid}>
           <label>
             <span>Wedding date and time</span>
             <input
@@ -139,9 +140,9 @@ export function WeddingSettingsForm({ settings }: Props) {
         </div>
       </div>
 
-      <div className="admin-form-section">
-        <p className="admin-eyebrow">Public copy</p>
-        <div className="admin-form-grid admin-form-grid-wide">
+      <div className={adminStyles.formSection}>
+        <p className={adminStyles.eyebrow}>Public copy</p>
+        <div className={`${adminStyles.formGrid} ${adminStyles.formGridWide}`}>
           <label>
             <span>Hero eyebrow</span>
             <input
@@ -158,7 +159,7 @@ export function WeddingSettingsForm({ settings }: Props) {
               required
             />
           </label>
-          <label className="admin-field-wide">
+          <label className={adminStyles.fieldWide}>
             <span>Hero message</span>
             <textarea
               name="hero_message"
@@ -167,7 +168,7 @@ export function WeddingSettingsForm({ settings }: Props) {
               required
             />
           </label>
-          <label className="admin-field-wide">
+          <label className={adminStyles.fieldWide}>
             <span>Story introduction</span>
             <textarea
               name="story_introduction"
@@ -176,7 +177,7 @@ export function WeddingSettingsForm({ settings }: Props) {
               required
             />
           </label>
-          <label className="admin-field-wide">
+          <label className={adminStyles.fieldWide}>
             <span>Story body</span>
             <textarea
               name="story_body"
@@ -188,18 +189,21 @@ export function WeddingSettingsForm({ settings }: Props) {
         </div>
       </div>
 
-      <div className="admin-form-footer">
-        <label className="admin-publish-toggle">
+      <div className={adminStyles.formFooter}>
+        <label className={adminStyles.publishToggle}>
           <input
+            className={adminStyles.publishCheckbox}
             name="is_published"
             type="checkbox"
             defaultChecked={settings?.is_published ?? false}
           />
           <span>Publish these details on the public website</span>
         </label>
-        {state.error ? <p className="admin-form-error">{state.error}</p> : null}
+        {state.error ? (
+          <p className={adminStyles.formError}>{state.error}</p>
+        ) : null}
         <button
-          className="admin-primary-button"
+          className={adminStyles.primaryButton}
           type="submit"
           disabled={isPending}
         >

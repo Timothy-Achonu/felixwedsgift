@@ -129,13 +129,21 @@ export function PhotoUploadDemo() {
 
   if (status === "success") {
     return (
-      <div className="upload-success" role="status">
-        <span className="upload-success-icon" aria-hidden="true">
+      <div
+        className="border-wedding-cream/50 flex min-h-[34rem] flex-col items-center justify-center border px-6 py-10 text-center"
+        role="status"
+      >
+        <span
+          className="bg-wedding-blue text-wedding-brown mb-6 grid size-18 place-items-center rounded-full"
+          aria-hidden="true"
+        >
           <Check />
         </span>
         <p className="eyebrow">Preview complete</p>
-        <h3 className="font-display">Thank you for sharing the joy.</h3>
-        <p>
+        <h3 className="wedding-display mt-[0.8rem] mb-4 max-w-[12ch] text-[2.5rem] leading-none font-medium">
+          Thank you for sharing the joy.
+        </h3>
+        <p className="text-wedding-cream/72 mb-7 max-w-[28rem] leading-[1.7]">
           In the live experience, your photos will be sent to Felix and Gift for
           review. No files left your device in this prototype.
         </p>
@@ -152,9 +160,9 @@ export function PhotoUploadDemo() {
   }
 
   return (
-    <div className="upload-demo">
+    <div className="min-w-0">
       <div
-        className="upload-dropzone"
+        className="border-wedding-cream/52 hover:border-wedding-blue hover:bg-wedding-navy/12 flex min-h-[25rem] flex-col items-center justify-center border px-5 py-10 text-center transition-[background-color,border-color] duration-180 ease-out"
         onDragOver={(event) => event.preventDefault()}
         onDrop={(event) => {
           event.preventDefault();
@@ -163,11 +171,15 @@ export function PhotoUploadDemo() {
       >
         <ImagePlus
           aria-hidden="true"
-          className="upload-icon"
+          className="text-wedding-blue size-12"
           strokeWidth={1.25}
         />
-        <h3 className="font-display">Bring your view of the day</h3>
-        <p>Choose up to 10 JPEG, PNG, or WebP photos, 10 MB each.</p>
+        <h3 className="wedding-display mt-6 mb-3 max-w-[12ch] text-[2.3rem] leading-none font-medium">
+          Bring your view of the day
+        </h3>
+        <p className="text-wedding-cream/70 mb-7 max-w-[23rem] text-[0.83rem] leading-[1.6]">
+          Choose up to 10 JPEG, PNG, or WebP photos, 10 MB each.
+        </p>
         <label className="button button-cream focus-within:ring-wedding-blue focus-within:ring-2">
           <ImagePlus aria-hidden="true" className="size-4" />
           Choose photos
@@ -185,23 +197,26 @@ export function PhotoUploadDemo() {
         </label>
       </div>
 
-      <p className="prototype-notice">
+      <p className="text-wedding-cream/74 mt-[0.9rem] mb-0 flex items-center gap-2 text-[0.72rem]">
         <ShieldCheck aria-hidden="true" className="size-4" />
         Prototype mode: your photos stay on this device.
       </p>
 
       {error ? (
-        <p className="upload-error" role="alert">
+        <p
+          className="border-wedding-blue bg-wedding-navy/24 mt-4 mb-0 border-l-[3px] px-[0.8rem] py-[0.65rem] text-[0.8rem]"
+          role="alert"
+        >
           {error}
         </p>
       ) : null}
 
       {previews.length > 0 ? (
-        <div className="upload-selection">
-          <div className="upload-selection-heading">
-            <p>
+        <div className="mt-8">
+          <div className="flex items-center justify-between gap-4">
+            <p className="m-0 text-[0.8rem] font-[750] uppercase">
               Your selection{" "}
-              <span>
+              <span className="text-wedding-blue">
                 {previews.length}/{MAX_FILES}
               </span>
             </p>
@@ -214,20 +229,24 @@ export function PhotoUploadDemo() {
             </button>
           </div>
 
-          <div className="upload-previews">
+          <div className="mt-4 grid grid-cols-3 gap-[0.65rem] sm:grid-cols-5">
             {previews.map((preview) => (
-              <figure key={preview.id}>
+              <figure
+                className="bg-wedding-navy relative m-0 aspect-square overflow-hidden"
+                key={preview.id}
+              >
                 <Image
                   src={preview.url}
                   alt={`Preview of ${preview.file.name}`}
                   width={160}
                   height={160}
                   unoptimized
+                  className="size-full object-cover"
                 />
                 <button
                   type="button"
                   aria-label={`Remove ${preview.file.name}`}
-                  className="focus-ring"
+                  className="focus-ring bg-wedding-navy text-wedding-cream absolute top-[0.35rem] right-[0.35rem] grid size-8 place-items-center rounded-full border-0"
                   onClick={() => removePreview(preview.id)}
                   disabled={status === "uploading"}
                 >
@@ -237,23 +256,31 @@ export function PhotoUploadDemo() {
             ))}
           </div>
 
-          <div className="upload-fields">
-            <label>
-              <span>
-                Your name <em>optional</em>
+          <div className="mt-7 grid gap-5 sm:grid-cols-2">
+            <label className="grid gap-[0.6rem]">
+              <span className="text-xs font-[750] uppercase">
+                Your name{" "}
+                <em className="text-wedding-cream/60 text-[0.68rem] font-medium lowercase not-italic">
+                  optional
+                </em>
               </span>
               <input
+                className="border-wedding-cream/45 text-wedding-cream focus:border-wedding-blue w-full resize-y rounded-none border-0 border-b bg-transparent py-3"
                 value={guestName}
                 onChange={(event) => setGuestName(event.target.value)}
                 maxLength={80}
                 disabled={status === "uploading"}
               />
             </label>
-            <label>
-              <span>
-                A note for the couple <em>optional</em>
+            <label className="grid gap-[0.6rem]">
+              <span className="text-xs font-[750] uppercase">
+                A note for the couple{" "}
+                <em className="text-wedding-cream/60 text-[0.68rem] font-medium lowercase not-italic">
+                  optional
+                </em>
               </span>
               <textarea
+                className="border-wedding-cream/45 text-wedding-cream focus:border-wedding-blue w-full resize-y rounded-none border-0 border-b bg-transparent py-3"
                 value={caption}
                 onChange={(event) => setCaption(event.target.value)}
                 maxLength={240}
@@ -264,13 +291,13 @@ export function PhotoUploadDemo() {
           </div>
 
           {status === "uploading" ? (
-            <div className="upload-progress" aria-live="polite">
-              <div className="upload-progress-copy">
+            <div className="mt-6" aria-live="polite">
+              <div className="flex items-center justify-between gap-4 text-[0.72rem] font-bold">
                 <span>Preparing your preview</span>
                 <span>{progress}%</span>
               </div>
               <div
-                className="upload-progress-track"
+                className="bg-wedding-cream/20 [&>span]:bg-wedding-blue mt-[0.6rem] h-[3px] overflow-hidden [&>span]:block [&>span]:h-full [&>span]:transition-[width] [&>span]:duration-220"
                 role="progressbar"
                 aria-valuemin={0}
                 aria-valuemax={100}
@@ -283,7 +310,7 @@ export function PhotoUploadDemo() {
 
           <button
             type="button"
-            className="button button-blue focus-ring upload-submit"
+            className="button button-blue focus-ring mt-6 w-full"
             onClick={startDemo}
             disabled={status === "uploading"}
           >

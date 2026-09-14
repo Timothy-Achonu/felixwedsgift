@@ -5,6 +5,7 @@ import { requireAdmin } from "@/lib/auth/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 import { logout } from "../actions";
+import { adminStyles } from "../admin-styles";
 import {
   WeddingSettingsForm,
   type WeddingSettingsFormValues,
@@ -32,53 +33,68 @@ export default async function WeddingDetailsPage({
   const params = await searchParams;
 
   return (
-    <main className="admin-page">
-      <header className="admin-header">
-        <Link className="admin-brand" href="/admin" aria-label="Admin overview">
-          <span className="admin-brand-monogram font-display">
-            F <em>&amp;</em> G
+    <main className={adminStyles.page}>
+      <header className={adminStyles.header}>
+        <Link
+          className={adminStyles.brand}
+          href="/admin"
+          aria-label="Admin overview"
+        >
+          <span className={adminStyles.brandMonogram}>
+            F <em className="text-wedding-blue">&amp;</em> G
           </span>
-          <span className="admin-brand-label">Studio</span>
+          <span className={adminStyles.brandLabel}>Studio</span>
         </Link>
-        <div className="admin-header-actions">
-          <span className="admin-user">{admin.email}</span>
+        <div className={adminStyles.headerActions}>
+          <span className={adminStyles.user}>{admin.email}</span>
           <form action={logout}>
-            <button className="admin-logout-button" type="submit">
+            <button className={adminStyles.logoutButton} type="submit">
               Sign out
             </button>
           </form>
         </div>
       </header>
 
-      <div className="admin-shell">
-        <aside className="admin-sidebar" aria-label="Admin navigation">
-          <p className="admin-eyebrow">Workspace</p>
-          <nav>
-            <Link className="admin-nav-link" href="/admin">
+      <div className={adminStyles.shell}>
+        <aside className={adminStyles.sidebar} aria-label="Admin navigation">
+          <p className={adminStyles.eyebrow}>Workspace</p>
+          <nav className={adminStyles.sidebarNav}>
+            <Link className={adminStyles.navLink} href="/admin">
               Overview
             </Link>
-            <span className="admin-nav-link is-disabled">Photos</span>
-            <Link className="admin-nav-link is-active" href="/admin/details">
+            <span
+              className={`${adminStyles.navLink} ${adminStyles.navDisabled}`}
+            >
+              Photos
+            </span>
+            <Link
+              className={`${adminStyles.navLink} ${adminStyles.navActive}`}
+              href="/admin/details"
+            >
               Wedding details
             </Link>
-            <span className="admin-nav-link is-disabled">Schedule</span>
+            <span
+              className={`${adminStyles.navLink} ${adminStyles.navDisabled}`}
+            >
+              Schedule
+            </span>
           </nav>
-          <Link className="admin-return-link" href="/">
+          <Link className={adminStyles.returnLink} href="/">
             <ArrowLeft aria-hidden="true" size={15} />
             Public website
           </Link>
         </aside>
 
         <section
-          className="admin-content admin-form-content"
+          className={`${adminStyles.content} ${adminStyles.formContent}`}
           aria-labelledby="details-heading"
         >
-          <div className="admin-content-intro">
-            <p className="admin-eyebrow">Wedding details</p>
-            <h1 id="details-heading" className="font-display">
+          <div className={adminStyles.contentIntro}>
+            <p className={adminStyles.eyebrow}>Wedding details</p>
+            <h1 id="details-heading" className={adminStyles.contentHeading}>
               Shape the day.
             </h1>
-            <p>
+            <p className={adminStyles.contentCopy}>
               These details power the public wedding website described in the
               PRD. Save drafts while you work, then publish when everything is
               ready.
@@ -86,14 +102,14 @@ export default async function WeddingDetailsPage({
           </div>
 
           {error ? (
-            <p className="admin-form-error admin-page-error">
+            <p className={`${adminStyles.formError} ${adminStyles.pageError}`}>
               The settings table is not available yet. Apply the Supabase
               content migration, then reload this page.
             </p>
           ) : (
             <>
               {params.saved === "1" ? (
-                <p className="admin-save-confirmation">
+                <p className={adminStyles.saveConfirmation}>
                   <CheckCircle2 aria-hidden="true" size={17} /> Wedding details
                   saved.
                 </p>
