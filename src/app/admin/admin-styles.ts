@@ -83,7 +83,8 @@ export const adminStyles = {
   scheduleControls: "flex items-center gap-2",
   iconButton:
     "inline-flex size-9 cursor-pointer items-center justify-center rounded-none border border-wedding-navy/22 bg-transparent text-wedding-navy transition-colors duration-180 hover:bg-wedding-navy hover:text-wedding-cream focus-visible:bg-wedding-navy focus-visible:text-wedding-cream disabled:cursor-not-allowed disabled:opacity-30",
-  scheduleForm: "mt-6 grid gap-4 border-t border-wedding-navy/12 pt-5",
+  scheduleForm:
+    "mt-6 grid gap-4 border-t border-wedding-navy/12 pt-5 [&_label]:grid [&_label]:gap-[0.45rem] [&_label]:text-[0.68rem] [&_label]:font-extrabold [&_label]:tracking-[0.05em] [&_label]:text-wedding-brown [&_label]:uppercase [&_input]:w-full [&_input]:rounded-none [&_input]:border [&_input]:border-wedding-navy/18 [&_input]:bg-admin-field-surface/52 [&_input]:px-[0.85rem] [&_input]:py-[0.8rem] [&_input]:text-[0.85rem] [&_input]:font-medium [&_input]:tracking-normal [&_input]:text-wedding-navy [&_input]:normal-case [&_textarea]:w-full [&_textarea]:resize-y [&_textarea]:rounded-none [&_textarea]:border [&_textarea]:border-wedding-navy/18 [&_textarea]:bg-admin-field-surface/52 [&_textarea]:px-[0.85rem] [&_textarea]:py-[0.8rem] [&_textarea]:text-[0.85rem] [&_textarea]:font-medium [&_textarea]:tracking-normal [&_textarea]:text-wedding-navy [&_textarea]:normal-case [&_input:focus]:border-wedding-blue [&_input:focus]:outline-2 [&_input:focus]:outline-offset-1 [&_input:focus]:outline-admin-focus/28 [&_textarea:focus]:border-wedding-blue [&_textarea:focus]:outline-2 [&_textarea:focus]:outline-offset-1 [&_textarea:focus]:outline-admin-focus/28",
   scheduleEmpty:
     "mt-12 border border-dashed border-wedding-navy/24 p-8 text-sm leading-7 text-wedding-navy/68",
   scheduleActions:
