@@ -12,6 +12,15 @@ const nextConfig: NextConfig = {
         hostname: "images.unsplash.com",
         pathname: "/photo-*",
       },
+      ...(process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME
+        ? [
+            {
+              protocol: "https" as const,
+              hostname: "res.cloudinary.com",
+              pathname: `/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/**`,
+            },
+          ]
+        : []),
     ],
   },
 };

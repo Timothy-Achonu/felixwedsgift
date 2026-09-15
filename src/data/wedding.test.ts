@@ -14,6 +14,7 @@ vi.mock("@/lib/supabase/server", () => ({
 }));
 
 import { getWeddingContent } from "./wedding";
+import { mockWeddingContent } from "./mock-wedding";
 
 describe("wedding content adapter", () => {
   it("uses the mock content when Supabase is not configured", async () => {
@@ -36,6 +37,10 @@ describe("wedding content adapter", () => {
     const scheduleQuery = {
       select: vi.fn(),
       order: vi.fn(),
+      returns: vi.fn(),
+    };
+    const pageImagesQuery = {
+      select: vi.fn(),
       returns: vi.fn(),
     };
 
@@ -76,10 +81,31 @@ describe("wedding content adapter", () => {
       ],
       error: null,
     });
+    pageImagesQuery.select.mockReturnValue(pageImagesQuery);
+    pageImagesQuery.returns.mockResolvedValue({
+      data: [
+        {
+          slot: "hero_desktop",
+          cloudinary_public_id: "wedding/page/example",
+          secure_url:
+            "https://res.cloudinary.com/example/image/upload/hero.jpg",
+          alt: "A couple beside each other",
+          width: 1600,
+          height: 900,
+          focal_x: 0.5,
+          focal_y: 0.5,
+        },
+      ],
+      error: null,
+    });
 
     mocks.createSupabaseServerClient.mockResolvedValue({
       from: vi.fn((table: string) =>
-        table === "wedding_settings" ? settingsQuery : scheduleQuery,
+        table === "wedding_settings"
+          ? settingsQuery
+          : table === "schedule_items"
+            ? scheduleQuery
+            : pageImagesQuery,
       ),
     });
 
@@ -89,6 +115,12 @@ describe("wedding content adapter", () => {
     expect(wedding.weddingDateLabel).toBe("18 December 2026");
     expect(wedding.story.heading).toBe("We found home in each other.");
     expect(wedding.details.heading).toBe("Join us in Lagos");
+    expect(wedding.hero.image.src).toBe(
+      "https://res.cloudinary.com/example/image/upload/hero.jpg",
+    );
+    expect(wedding.hero.mobileImage.src).toBe(
+      mockWeddingContent.hero.mobileImage.src,
+    );
     expect(wedding.schedule).toEqual([
       {
         id: "schedule-1",

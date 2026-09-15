@@ -8,6 +8,8 @@ export type WeddingPhoto = {
   height: number;
   caption: string;
   guestName?: string;
+  focalX?: number;
+  focalY?: number;
 };
 
 export type ScheduleItem = {
@@ -30,6 +32,7 @@ export type WeddingContent = {
     eyebrow: string;
     message: string;
     image: WeddingPhoto;
+    mobileImage: WeddingPhoto;
   };
   story: {
     heading: string;
@@ -45,6 +48,7 @@ export type WeddingContent = {
     venueAddress: string;
     dressCode: string;
     directionsUrl: string;
+    image: WeddingPhoto;
   };
   schedule: ScheduleItem[];
   gallery: WeddingPhoto[];

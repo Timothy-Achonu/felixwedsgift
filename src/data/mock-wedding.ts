@@ -83,6 +83,7 @@ export const mockWeddingContent = {
     eyebrow: "With full hearts",
     message: "We are getting married",
     image: photos.hero,
+    mobileImage: photos.hero,
   },
   story: {
     heading: "We found home in each other.",
@@ -100,6 +101,7 @@ export const mockWeddingContent = {
     dressCode: "Formal / Elegantly colourful",
     directionsUrl:
       "https://www.google.com/maps/search/?api=1&query=The+Garden+Estate+Lagos+Nigeria",
+    image: photos.table,
   },
   schedule: [
     {

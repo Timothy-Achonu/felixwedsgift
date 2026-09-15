@@ -5,7 +5,7 @@ import {
   Camera,
   MapPin,
 } from "lucide-react";
-import Image from "next/image";
+import Image, { getImageProps } from "next/image";
 import Link from "next/link";
 import type { Metadata } from "next";
 
@@ -26,6 +26,23 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function Home() {
   const wedding = await getWeddingContent();
   const coupleName = `${wedding.couple.partnerOne} & ${wedding.couple.partnerTwo}`;
+  const commonHeroProps = { alt: wedding.hero.image.alt, sizes: "100vw" };
+  const {
+    props: { srcSet: desktopHeroSrcSet },
+  } = getImageProps({
+    ...commonHeroProps,
+    src: wedding.hero.image.src,
+    width: wedding.hero.image.width,
+    height: wedding.hero.image.height,
+    priority: true,
+  });
+  const { props: mobileHeroProps } = getImageProps({
+    ...commonHeroProps,
+    src: wedding.hero.mobileImage.src,
+    width: wedding.hero.mobileImage.width,
+    height: wedding.hero.mobileImage.height,
+    priority: true,
+  });
 
   return (
     <main id="home">
@@ -34,14 +51,17 @@ export default async function Home() {
         aria-labelledby="wedding-heading"
       >
         <SiteHeader />
-        <Image
-          src={wedding.hero.image.src}
-          alt={wedding.hero.image.alt}
-          fill
-          priority
-          sizes="100vw"
-          className="animate-[hero-image-in_1.4s_cubic-bezier(0.2,0.7,0.2,1)_both] object-cover object-[58%_center]"
-        />
+        <picture>
+          <source media="(min-width: 768px)" srcSet={desktopHeroSrcSet} />
+          <img
+            {...mobileHeroProps}
+            alt={wedding.hero.image.alt}
+            className="absolute inset-0 size-full animate-[hero-image-in_1.4s_cubic-bezier(0.2,0.7,0.2,1)_both] object-cover"
+            style={{
+              objectPosition: `${(wedding.hero.mobileImage.focalX ?? 0.58) * 100}% ${(wedding.hero.mobileImage.focalY ?? 0.5) * 100}%`,
+            }}
+          />
+        </picture>
         <div
           className="bg-wedding-navy/[42%] absolute inset-0 z-1"
           aria-hidden="true"
@@ -139,6 +159,9 @@ export default async function Home() {
                 alt={wedding.story.images[0].alt}
                 fill
                 sizes="(max-width: 768px) 78vw, 40vw"
+                style={{
+                  objectPosition: `${(wedding.story.images[0].focalX ?? 0.5) * 100}% ${(wedding.story.images[0].focalY ?? 0.5) * 100}%`,
+                }}
               />
             </figure>
             <figure className="border-wedding-paper bg-wedding-mist absolute right-0 bottom-0 m-0 aspect-4/3 w-[48%] overflow-hidden border-[0.6rem] [&_img]:object-cover">
@@ -147,6 +170,9 @@ export default async function Home() {
                 alt={wedding.story.images[1].alt}
                 fill
                 sizes="(max-width: 768px) 54vw, 22vw"
+                style={{
+                  objectPosition: `${(wedding.story.images[1].focalX ?? 0.5) * 100}% ${(wedding.story.images[1].focalY ?? 0.5) * 100}%`,
+                }}
               />
             </figure>
             <p className="font-display text-wedding-brown absolute top-4 -right-4 m-0 text-[1.15rem] italic [writing-mode:vertical-rl]">
@@ -260,10 +286,13 @@ export default async function Home() {
       >
         <div className="relative min-h-96 [&_img]:object-cover">
           <Image
-            src="/images/wedding/reception-table.jpg"
-            alt="An elegant wedding reception table prepared for guests"
+            src={wedding.details.image.src}
+            alt={wedding.details.image.alt}
             fill
             sizes="(max-width: 768px) 100vw, 55vw"
+            style={{
+              objectPosition: `${(wedding.details.image.focalX ?? 0.5) * 100}% ${(wedding.details.image.focalY ?? 0.5) * 100}%`,
+            }}
           />
         </div>
         <Reveal className="self-center px-5 py-18 md:px-[clamp(2.5rem,6vw,6rem)] md:py-20 [&>p:not(.eyebrow)]:m-0 [&>p:not(.eyebrow)]:font-bold">

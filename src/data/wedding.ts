@@ -4,6 +4,7 @@ import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 import { mockWeddingContent } from "./mock-wedding";
+import { pagePhoto, type PageImageRow } from "./page-images";
 
 type WeddingSettingsRow = {
   partner_one_name: string;
@@ -80,6 +81,23 @@ export async function getWeddingContent(): Promise<WeddingContent> {
     });
   }
 
+  const { data: pageImages, error: pageImagesError } = await supabase
+    .from("page_images")
+    .select(
+      "slot, cloudinary_public_id, secure_url, alt, width, height, focal_x, focal_y",
+    )
+    .returns<PageImageRow[]>();
+
+  if (pageImagesError) {
+    throw new Error("Unable to load published page images.", {
+      cause: pageImagesError,
+    });
+  }
+
+  const images = new Map(
+    (pageImages ?? []).map((row) => [row.slot, pagePhoto(row)]),
+  );
+
   return {
     ...mockWeddingContent,
     isMock: false,
@@ -97,12 +115,19 @@ export async function getWeddingContent(): Promise<WeddingContent> {
       ...mockWeddingContent.hero,
       eyebrow: settings.hero_eyebrow,
       message: settings.hero_message,
+      image: images.get("hero_desktop") ?? mockWeddingContent.hero.image,
+      mobileImage:
+        images.get("hero_mobile") ?? mockWeddingContent.hero.mobileImage,
     },
     story: {
       ...mockWeddingContent.story,
       heading: settings.story_heading,
       introduction: settings.story_introduction,
       body: settings.story_body,
+      images: [
+        images.get("story_primary") ?? mockWeddingContent.story.images[0],
+        images.get("story_inset") ?? mockWeddingContent.story.images[1],
+      ],
     },
     details: {
       ...mockWeddingContent.details,
@@ -113,6 +138,7 @@ export async function getWeddingContent(): Promise<WeddingContent> {
       venueAddress: settings.venue_address,
       dressCode: settings.dress_code,
       directionsUrl: settings.directions_url,
+      image: images.get("venue") ?? mockWeddingContent.details.image,
     },
     schedule: (schedule ?? []).map((item) => ({
       id: item.id,
