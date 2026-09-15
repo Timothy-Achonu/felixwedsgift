@@ -1,9 +1,18 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
-import Home from "@/app/page";
+import Home, { generateMetadata } from "@/app/page";
 
 describe("home page", () => {
+  it("generates metadata from the wedding content", async () => {
+    const metadata = await generateMetadata();
+
+    expect(metadata.title).toBe("Felix & Gift | 18 December 2026");
+    expect(metadata.description).toBe(
+      "Join Felix and Gift for a joyful wedding celebration in Lagos, Nigeria.",
+    );
+  });
+
   it("renders the complete public wedding structure", async () => {
     render(await Home());
 

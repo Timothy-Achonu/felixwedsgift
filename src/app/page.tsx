@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import type { Metadata } from "next";
 
 import { WeddingCountdown } from "@/components/wedding/countdown";
 import { PhotoUploadDemo } from "@/components/wedding/photo-upload-demo";
@@ -14,6 +15,13 @@ import { Reveal } from "@/components/wedding/reveal";
 import { SiteHeader } from "@/components/wedding/site-header";
 import { WeddingGallery } from "@/components/wedding/wedding-gallery";
 import { getWeddingContent } from "@/data/wedding";
+import { getPublicWeddingMetadata } from "@/lib/wedding/metadata";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const wedding = await getWeddingContent();
+
+  return getPublicWeddingMetadata(wedding, "home");
+}
 
 export default async function Home() {
   const wedding = await getWeddingContent();

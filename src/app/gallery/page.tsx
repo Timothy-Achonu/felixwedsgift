@@ -5,11 +5,13 @@ import Link from "next/link";
 import { SiteHeader } from "@/components/wedding/site-header";
 import { WeddingGallery } from "@/components/wedding/wedding-gallery";
 import { getWeddingContent } from "@/data/wedding";
+import { getPublicWeddingMetadata } from "@/lib/wedding/metadata";
 
-export const metadata: Metadata = {
-  title: "Wedding Gallery | Felix & Gift",
-  description: "Photographs from Felix and Gift's wedding celebration.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const wedding = await getWeddingContent();
+
+  return getPublicWeddingMetadata(wedding, "gallery");
+}
 
 export default async function GalleryPage() {
   const wedding = await getWeddingContent();

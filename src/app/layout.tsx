@@ -17,9 +17,8 @@ const bodyFont = Manrope({
 });
 
 export const metadata: Metadata = {
-  title: "Felix & Gift | 18 December 2026",
-  description:
-    "Join Felix and Gift for a joyful wedding celebration in Lagos, Nigeria.",
+  title: "Wedding website",
+  description: "A joyful wedding celebration.",
   robots: {
     index: false,
     follow: false,
