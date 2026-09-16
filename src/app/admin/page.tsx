@@ -3,20 +3,27 @@ import { AdminShell } from "./admin-shell";
 import { CalendarDays, Camera, Settings } from "lucide-react";
 import Link from "next/link";
 
-const upcomingModules = [
+const overviewModules = [
   {
     icon: Settings,
     label: "Wedding settings",
+    status: "Available now",
     description: "Names, date, venue, story, and details.",
+    href: "/admin/details",
+    actionLabel: "Edit wedding details",
   },
   {
     icon: CalendarDays,
     label: "Schedule",
+    status: "Available now",
     description: "Shape the order of joy for the celebration.",
+    href: "/admin/schedule",
+    actionLabel: "Open schedule",
   },
   {
     icon: Camera,
     label: "Photo moderation",
+    status: "Coming next",
     description: "Review and curate guest photographs.",
   },
 ];
@@ -33,31 +40,32 @@ export default async function AdminPage() {
             thoughtfully held.
           </h1>
           <p className={adminStyles.contentCopy}>
-            Your workspace is ready. The next steps will connect the wedding
-            details, schedule, and guest memories to this home.
+            Your workspace is ready. Manage the wedding details and schedule
+            here, with guest photo moderation coming next.
           </p>
         </div>
 
         <div className={adminStyles.moduleGrid}>
-          {upcomingModules.map(({ icon: Icon, label, description }) => (
-            <article className={adminStyles.moduleCard} key={label}>
-              <Icon aria-hidden="true" size={22} strokeWidth={1.5} />
-              <p className={adminStyles.eyebrow}>Coming next</p>
-              <h2 className={adminStyles.moduleHeading}>{label}</h2>
-              <p>{description}</p>
-              {label === "Wedding settings" ? (
-                <Link className={adminStyles.cardLink} href="/admin/details">
-                  Edit wedding details
-                </Link>
-              ) : null}
-            </article>
-          ))}
+          {overviewModules.map(
+            ({ icon: Icon, label, status, description, href, actionLabel }) => (
+              <article className={adminStyles.moduleCard} key={label}>
+                <Icon aria-hidden="true" size={22} strokeWidth={1.5} />
+                <p className={adminStyles.eyebrow}>{status}</p>
+                <h2 className={adminStyles.moduleHeading}>{label}</h2>
+                <p>{description}</p>
+                {href && actionLabel ? (
+                  <Link className={adminStyles.cardLink} href={href}>
+                    {actionLabel}
+                  </Link>
+                ) : null}
+              </article>
+            ),
+          )}
         </div>
 
         <p className={adminStyles.honestyNote}>
-          This first shell intentionally shows no sample counts or wedding data.
-          Once Supabase content is connected, this overview will reflect the
-          live celebration.
+          This overview does not show live counts yet. Once Supabase content is
+          connected, it will reflect the live celebration.
         </p>
       </section>
     </AdminShell>

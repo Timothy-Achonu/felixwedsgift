@@ -67,4 +67,30 @@ describe("admin login form", () => {
     ).toBeInTheDocument();
     expect(replace).not.toHaveBeenCalled();
   });
+
+  it("shows and hides the password when toggled", () => {
+    render(<AdminLoginForm />);
+
+    const passwordInput = screen.getByLabelText("Password");
+    const showPasswordButton = screen.getByRole("button", {
+      name: "Show password",
+    });
+
+    expect(passwordInput).toHaveAttribute("type", "password");
+    expect(showPasswordButton).toHaveAttribute("aria-pressed", "false");
+
+    fireEvent.click(showPasswordButton);
+
+    expect(passwordInput).toHaveAttribute("type", "text");
+    expect(
+      screen.getByRole("button", { name: "Hide password" }),
+    ).toHaveAttribute("aria-pressed", "true");
+
+    fireEvent.click(screen.getByRole("button", { name: "Hide password" }));
+
+    expect(passwordInput).toHaveAttribute("type", "password");
+    expect(
+      screen.getByRole("button", { name: "Show password" }),
+    ).toHaveAttribute("aria-pressed", "false");
+  });
 });

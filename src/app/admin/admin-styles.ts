@@ -15,8 +15,11 @@ export const adminStyles = {
   fieldLabel: "grid gap-[0.55rem]",
   fieldLabelText:
     "text-[0.68rem] font-extrabold tracking-[0.08em] text-wedding-brown uppercase",
+  passwordField: "relative",
   loginInput:
     "w-full rounded-none border border-wedding-navy/28 bg-wedding-cream/50 px-[0.9rem] py-[0.85rem] focus:border-wedding-navy focus:outline-2 focus:outline-offset-2 focus:outline-wedding-blue",
+  passwordToggle:
+    "absolute top-1/2 right-2 inline-flex size-9 -translate-y-1/2 cursor-pointer items-center justify-center rounded-none border border-transparent text-wedding-navy transition-colors duration-180 hover:border-wedding-navy/18 hover:bg-wedding-paper focus-visible:border-wedding-blue focus-visible:outline-2 focus-visible:outline-wedding-blue",
   formError: "m-0 min-h-5 text-[0.78rem] leading-normal text-status-error",
   primaryButton:
     "cursor-pointer rounded-none border border-wedding-navy bg-wedding-navy px-4 py-[0.95rem] text-[0.72rem] font-extrabold tracking-[0.08em] text-wedding-cream uppercase transition-colors duration-180 hover:not-disabled:bg-wedding-brown focus-visible:bg-wedding-brown disabled:cursor-wait disabled:opacity-60",
@@ -28,11 +31,10 @@ export const adminStyles = {
   brandMonogram: "wedding-display text-[1.7rem] leading-[0.9]",
   brandLabel:
     "mt-[0.35rem] text-[0.58rem] font-extrabold tracking-[0.15em] text-wedding-brown uppercase",
-  sidebarHeader:
-    "flex min-w-0 items-center justify-between gap-4 border-b border-wedding-navy/14 pb-4 phone:gap-5 md:block md:border-b-0 md:pb-0",
+  sidebarHeader: "flex min-w-0 items-center justify-between gap-4 phone:gap-5",
   headerActions:
-    "flex min-w-0 items-center justify-end gap-2 phone:gap-4 md:mt-10 md:block",
-  user: "min-w-0 flex-1 max-w-60 overflow-hidden text-right text-[0.72rem] text-ellipsis whitespace-nowrap text-wedding-navy/64",
+    "flex min-w-0 items-center justify-end gap-2 phone:gap-4 md:block",
+  user: "block min-w-0 max-w-60 overflow-hidden text-right text-[0.72rem] text-ellipsis whitespace-nowrap text-wedding-navy/64 md:text-left",
   logoutButton:
     "shrink-0 cursor-pointer rounded-none border border-wedding-navy bg-transparent px-[0.8rem] py-[0.65rem] text-[0.72rem] font-extrabold tracking-[0.08em] text-wedding-navy uppercase transition-colors duration-180 hover:bg-wedding-navy hover:text-wedding-cream focus-visible:bg-wedding-navy focus-visible:text-wedding-cream md:mt-3",
   shell: "grid min-h-svh min-w-0 md:grid-cols-[15rem_1fr]",
@@ -44,9 +46,10 @@ export const adminStyles = {
     "shrink-0 whitespace-nowrap px-[0.6rem] py-[0.55rem] text-[0.68rem] font-extrabold tracking-[0.06em] text-wedding-brown no-underline uppercase phone:px-[0.7rem]",
   navActive: "bg-wedding-navy text-wedding-cream",
   navDisabled: "cursor-not-allowed opacity-45",
-  sidebarFooter: "mt-auto md:border-t md:border-wedding-navy/14 md:pt-5",
+  sidebarFooter:
+    "mt-auto grid gap-5 md:border-t md:border-wedding-navy/14 md:pt-5",
   returnLink:
-    "mt-auto inline-flex items-center gap-2 text-[0.7rem] font-extrabold tracking-[0.06em] text-wedding-brown no-underline uppercase hover:text-wedding-navy hover:underline hover:underline-offset-4",
+    "inline-flex items-center gap-2 text-[0.7rem] font-extrabold tracking-[0.06em] text-wedding-brown no-underline uppercase hover:text-wedding-navy hover:underline hover:underline-offset-4",
   content:
     "w-[min(100%,76rem)] min-w-0 px-5 py-[clamp(2.5rem,7vw,6rem)] md:px-[clamp(2rem,7vw,7rem)]",
   formContent: "min-w-0 max-w-[78rem]",

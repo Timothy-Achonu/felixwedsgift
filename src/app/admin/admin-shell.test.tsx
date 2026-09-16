@@ -42,14 +42,21 @@ describe("admin shell", () => {
     expect(
       within(navigation).getByRole("link", { name: "Wedding details" }),
     ).toHaveAttribute("aria-current", "page");
+    const email = within(navigation).getByText("admin@example.com");
+    expect(email).toBeInTheDocument();
+    const signOut = within(navigation).getByRole("button", {
+      name: "Sign out",
+    });
+    const publicWebsite = within(navigation).getByRole("link", {
+      name: /Public website/,
+    });
     expect(
-      within(navigation).getByText("admin@example.com"),
-    ).toBeInTheDocument();
-    expect(
-      within(navigation).getByRole("button", { name: "Sign out" }),
-    ).toBeInTheDocument();
-    expect(
-      within(navigation).getByRole("link", { name: /Public website/ }),
-    ).toHaveAttribute("href", "/");
+      Boolean(
+        signOut.compareDocumentPosition(publicWebsite) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+      ),
+    ).toBe(true);
+    expect(signOut).toBeInTheDocument();
+    expect(publicWebsite).toHaveAttribute("href", "/");
   });
 });

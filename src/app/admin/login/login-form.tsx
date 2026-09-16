@@ -1,5 +1,6 @@
 "use client";
 
+import { Eye, EyeOff } from "lucide-react";
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 
@@ -11,6 +12,7 @@ export function AdminLoginForm() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -56,15 +58,30 @@ export function AdminLoginForm() {
       </label>
       <label className={adminStyles.fieldLabel}>
         <span className={adminStyles.fieldLabelText}>Password</span>
-        <input
-          className={adminStyles.loginInput}
-          autoComplete="current-password"
-          name="password"
-          onChange={(event) => setPassword(event.target.value)}
-          required
-          type="password"
-          value={password}
-        />
+        <div className={adminStyles.passwordField}>
+          <input
+            className={`${adminStyles.loginInput} pr-12`}
+            autoComplete="current-password"
+            name="password"
+            onChange={(event) => setPassword(event.target.value)}
+            required
+            type={isPasswordVisible ? "text" : "password"}
+            value={password}
+          />
+          <button
+            aria-label={isPasswordVisible ? "Hide password" : "Show password"}
+            aria-pressed={isPasswordVisible}
+            className={adminStyles.passwordToggle}
+            onClick={() => setIsPasswordVisible((visible) => !visible)}
+            type="button"
+          >
+            {isPasswordVisible ? (
+              <EyeOff aria-hidden="true" size={18} />
+            ) : (
+              <Eye aria-hidden="true" size={18} />
+            )}
+          </button>
+        </div>
       </label>
       <p aria-live="polite" className={adminStyles.formError}>
         {error}

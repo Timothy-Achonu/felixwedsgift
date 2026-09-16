@@ -33,14 +33,6 @@ export async function AdminShell({
               </span>
               <span className={adminStyles.brandLabel}>Studio</span>
             </Link>
-            <div className={adminStyles.headerActions}>
-              <span className={adminStyles.user}>{admin.email}</span>
-              <form action={logout}>
-                <button className={adminStyles.logoutButton} type="submit">
-                  Sign out
-                </button>
-              </form>
-            </div>
           </div>
 
           <p className={adminStyles.eyebrow}>Workspace</p>
@@ -82,6 +74,14 @@ export async function AdminShell({
             </Link>
           </nav>
           <div className={adminStyles.sidebarFooter}>
+            <div className={adminStyles.headerActions}>
+              <span className={adminStyles.user}>{admin.email}</span>
+              <form action={logout}>
+                <button className={adminStyles.logoutButton} type="submit">
+                  Sign out
+                </button>
+              </form>
+            </div>
             <Link className={adminStyles.returnLink} href="/">
               <ArrowLeft aria-hidden="true" size={15} />
               Public website
