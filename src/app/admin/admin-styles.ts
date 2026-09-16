@@ -24,26 +24,27 @@ export const adminStyles = {
     "grid gap-2 border-l-[3px] border-wedding-blue bg-wedding-navy/7 px-4 py-[0.9rem] text-[0.78rem] leading-[1.6] [&_strong]:text-wedding-brown",
   backLink:
     "mt-8 inline-flex items-center gap-2 text-[0.7rem] font-extrabold tracking-[0.06em] text-wedding-brown no-underline uppercase hover:text-wedding-navy hover:underline hover:underline-offset-4",
-  header:
-    "flex min-w-0 items-center justify-between gap-2 border-b border-wedding-navy/14 px-4 py-3 phone:gap-4 phone:px-5 phone:py-4 md:px-8",
   brand: "inline-flex shrink-0 flex-col text-inherit no-underline",
   brandMonogram: "wedding-display text-[1.7rem] leading-[0.9]",
   brandLabel:
     "mt-[0.35rem] text-[0.58rem] font-extrabold tracking-[0.15em] text-wedding-brown uppercase",
+  sidebarHeader:
+    "flex min-w-0 items-center justify-between gap-4 border-b border-wedding-navy/14 pb-4 phone:gap-5 md:block md:border-b-0 md:pb-0",
   headerActions:
-    "flex min-w-0 flex-1 items-center justify-end gap-2 phone:gap-4",
+    "flex min-w-0 items-center justify-end gap-2 phone:gap-4 md:mt-10 md:block",
   user: "min-w-0 flex-1 max-w-60 overflow-hidden text-right text-[0.72rem] text-ellipsis whitespace-nowrap text-wedding-navy/64",
   logoutButton:
-    "shrink-0 cursor-pointer rounded-none border border-wedding-navy bg-transparent px-[0.8rem] py-[0.65rem] text-[0.72rem] font-extrabold tracking-[0.08em] text-wedding-navy uppercase transition-colors duration-180 hover:bg-wedding-navy hover:text-wedding-cream focus-visible:bg-wedding-navy focus-visible:text-wedding-cream",
-  shell: "grid min-w-0 min-h-[calc(100vh-5.1rem)] md:grid-cols-[15rem_1fr]",
+    "shrink-0 cursor-pointer rounded-none border border-wedding-navy bg-transparent px-[0.8rem] py-[0.65rem] text-[0.72rem] font-extrabold tracking-[0.08em] text-wedding-navy uppercase transition-colors duration-180 hover:bg-wedding-navy hover:text-wedding-cream focus-visible:bg-wedding-navy focus-visible:text-wedding-cream md:mt-3",
+  shell: "grid min-h-svh min-w-0 md:grid-cols-[15rem_1fr]",
   sidebar:
-    "flex min-w-0 max-w-full flex-col gap-4 border-b border-wedding-navy/14 px-4 py-4 phone:p-5 md:sticky md:top-0 md:h-[calc(100vh-5.1rem)] md:self-start md:overflow-y-auto md:border-r md:border-b-0 md:px-5 md:py-8",
+    "sticky top-0 z-20 flex min-w-0 max-w-full flex-col gap-4 border-b border-wedding-navy/14 bg-wedding-cream px-4 py-4 phone:p-5 md:h-svh md:self-start md:overflow-y-auto md:border-r md:border-b-0 md:px-5 md:py-8",
   sidebarNav:
     "flex min-w-0 max-w-full gap-1 overflow-x-auto overscroll-x-contain scrollbar-hide phone:gap-2 md:grid md:overflow-visible",
   navLink:
     "shrink-0 whitespace-nowrap px-[0.6rem] py-[0.55rem] text-[0.68rem] font-extrabold tracking-[0.06em] text-wedding-brown no-underline uppercase phone:px-[0.7rem]",
   navActive: "bg-wedding-navy text-wedding-cream",
   navDisabled: "cursor-not-allowed opacity-45",
+  sidebarFooter: "mt-auto md:border-t md:border-wedding-navy/14 md:pt-5",
   returnLink:
     "mt-auto inline-flex items-center gap-2 text-[0.7rem] font-extrabold tracking-[0.06em] text-wedding-brown no-underline uppercase hover:text-wedding-navy hover:underline hover:underline-offset-4",
   content:

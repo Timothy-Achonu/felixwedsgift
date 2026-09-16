@@ -20,29 +20,29 @@ export async function AdminShell({
 
   return (
     <main className={adminStyles.page}>
-      <header className={adminStyles.header}>
-        <Link
-          className={adminStyles.brand}
-          href="/admin"
-          aria-label="Admin overview"
-        >
-          <span className={adminStyles.brandMonogram}>
-            F <em className="text-wedding-blue">&amp;</em> G
-          </span>
-          <span className={adminStyles.brandLabel}>Studio</span>
-        </Link>
-        <div className={adminStyles.headerActions}>
-          <span className={adminStyles.user}>{admin.email}</span>
-          <form action={logout}>
-            <button className={adminStyles.logoutButton} type="submit">
-              Sign out
-            </button>
-          </form>
-        </div>
-      </header>
-
       <div className={adminStyles.shell}>
         <aside className={adminStyles.sidebar} aria-label="Admin navigation">
+          <div className={adminStyles.sidebarHeader}>
+            <Link
+              className={adminStyles.brand}
+              href="/admin"
+              aria-label="Admin overview"
+            >
+              <span className={adminStyles.brandMonogram}>
+                F <em className="text-wedding-blue">&amp;</em> G
+              </span>
+              <span className={adminStyles.brandLabel}>Studio</span>
+            </Link>
+            <div className={adminStyles.headerActions}>
+              <span className={adminStyles.user}>{admin.email}</span>
+              <form action={logout}>
+                <button className={adminStyles.logoutButton} type="submit">
+                  Sign out
+                </button>
+              </form>
+            </div>
+          </div>
+
           <p className={adminStyles.eyebrow}>Workspace</p>
           <nav className={adminStyles.sidebarNav}>
             <Link
@@ -81,10 +81,12 @@ export async function AdminShell({
               Schedule
             </Link>
           </nav>
-          <Link className={adminStyles.returnLink} href="/">
-            <ArrowLeft aria-hidden="true" size={15} />
-            Public website
-          </Link>
+          <div className={adminStyles.sidebarFooter}>
+            <Link className={adminStyles.returnLink} href="/">
+              <ArrowLeft aria-hidden="true" size={15} />
+              Public website
+            </Link>
+          </div>
         </aside>
         {children}
       </div>
