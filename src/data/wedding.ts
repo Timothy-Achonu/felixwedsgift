@@ -1,7 +1,9 @@
+import { notFound } from "next/navigation";
+
 import type { WeddingContent } from "@/types/wedding";
 
 import { isSupabaseConfigured } from "@/lib/supabase/config";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { createSupabasePublicClient } from "@/lib/supabase/public";
 
 import { mockWeddingContent } from "./mock-wedding";
 import { pagePhoto, type PageImageRow } from "./page-images";
@@ -46,7 +48,7 @@ export async function getWeddingContent(): Promise<WeddingContent> {
     return mockWeddingContent;
   }
 
-  const supabase = await createSupabaseServerClient();
+  const supabase = createSupabasePublicClient();
   const { data: settings, error: settingsError } = await supabase
     .from("wedding_settings")
     .select(
@@ -63,9 +65,8 @@ export async function getWeddingContent(): Promise<WeddingContent> {
   }
 
   if (!settings) {
-    throw new Error(
-      "No published wedding settings found. Apply the Supabase seed or publish wedding settings from the admin area.",
-    );
+    // A deliberate unpublish must render a 404, not fail ISR and retain an old page.
+    notFound();
   }
 
   const { data: schedule, error: scheduleError } = await supabase

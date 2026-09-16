@@ -1,4 +1,4 @@
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 
 import { isPageImageSlot } from "@/data/page-images";
 import { getAdminIdentity } from "@/lib/auth/admin";
@@ -7,6 +7,8 @@ import {
   verifyPageImage,
 } from "@/lib/cloudinary/page-images";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { pageImageDimensionsError } from "@/lib/images/page-images";
+import { weddingContentTag } from "@/lib/wedding/cache";
 
 type SaveRequest = {
   slot?: unknown;
@@ -113,19 +115,22 @@ export async function POST(request: Request) {
         : await verifyPageImage(publicId);
   } catch {
     return Response.json(
-      { error: "The Cloudinary image could not be verified." },
+      {
+        error:
+          "The Cloudinary image could not be verified. Choose a valid JPEG, PNG or WebP photograph no larger than 10 MB.",
+      },
       { status: 400 },
     );
   }
-  if (
-    (slot === "hero_desktop" &&
-      (asset.width !== 1600 || asset.height !== 900)) ||
-    (slot === "hero_mobile" && (asset.width !== 900 || asset.height !== 1600))
-  ) {
+  const dimensionsError = pageImageDimensionsError(
+    slot,
+    asset.width,
+    asset.height,
+  );
+  if (publicId !== expectedPublicId && dimensionsError) {
     return Response.json(
       {
-        error:
-          "The hero crop does not match this screen's required ratio and resolution.",
+        error: dimensionsError,
       },
       { status: 400 },
     );
@@ -159,7 +164,7 @@ export async function POST(request: Request) {
   if (result.error || !result.data) {
     if (publicId !== expectedPublicId) {
       try {
-        await destroyPageImage(publicId);
+        await removeUnusedPageImage(supabase, publicId);
       } catch (error) {
         console.error("Page-image rollback failed", error);
       }
@@ -170,16 +175,31 @@ export async function POST(request: Request) {
     );
   }
 
+  revalidateTag(weddingContentTag, { expire: 0 });
   revalidatePath("/");
+  revalidatePath("/gallery");
   revalidatePath("/admin/page-images");
   if (previous && previous.cloudinary_public_id !== publicId) {
     try {
-      await destroyPageImage(previous.cloudinary_public_id);
+      await removeUnusedPageImage(supabase, previous.cloudinary_public_id);
     } catch (error) {
       console.error("Page-image cleanup failed", error);
     }
   }
   return Response.json({ image: payload });
+}
+
+async function removeUnusedPageImage(
+  supabase: Awaited<ReturnType<typeof createSupabaseServerClient>>,
+  publicId: string,
+) {
+  const { data, error } = await supabase
+    .from("page_images")
+    .select("slot")
+    .eq("cloudinary_public_id", publicId)
+    .limit(1);
+  if (error || !data) throw new Error("Unable to check unused page image.");
+  if (data.length === 0) await destroyPageImage(publicId);
 }
 
 export async function DELETE(request: Request) {

@@ -35,4 +35,43 @@ describe("Cloudinary page-image requests", () => {
     );
     expect(fetchMock).not.toHaveBeenCalled();
   });
+
+  const publicId = "wedding/page/12345678-1234-1234-1234-123456789abc";
+  const asset = {
+    public_id: publicId,
+    secure_url: `https://res.cloudinary.com/example-cloud/image/upload/v1/${publicId}.jpg`,
+    width: 4000,
+    height: 3000,
+    format: "jpg",
+    bytes: 5_000_000,
+  };
+
+  it("verifies original dimensions, format and bytes with an uncached provider read", async () => {
+    const request = vi
+      .spyOn(globalThis, "fetch")
+      .mockResolvedValue(Response.json(asset));
+    await expect(verifyPageImage(publicId)).resolves.toMatchObject({
+      width: 4000,
+      height: 3000,
+      format: "jpg",
+      bytes: 5_000_000,
+    });
+    expect(request.mock.calls[0][1]?.cache).toBe("no-store");
+  });
+
+  it.each([
+    { format: "svg" },
+    { format: "gif" },
+    { bytes: 10_000_001 },
+    { bytes: 0 },
+    { bytes: undefined },
+    { width: 1.5 },
+  ])("rejects unsupported provider metadata: %j", async (invalid) => {
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      Response.json({ ...asset, ...invalid }),
+    );
+    await expect(verifyPageImage(publicId)).rejects.toThrow(
+      "unexpected image asset",
+    );
+  });
 });

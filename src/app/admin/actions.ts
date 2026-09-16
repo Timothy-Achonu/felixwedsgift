@@ -1,9 +1,17 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { revalidatePath, updateTag } from "next/cache";
 
 import { requireAdmin } from "@/lib/auth/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { weddingContentTag } from "@/lib/wedding/cache";
+
+function invalidateWeddingContent() {
+  updateTag(weddingContentTag);
+  revalidatePath("/");
+  revalidatePath("/gallery");
+}
 
 export type WeddingSettingsActionState = {
   error?: string;
@@ -71,6 +79,7 @@ export async function saveWeddingSettings(
     };
   }
 
+  invalidateWeddingContent();
   redirect("/admin/details?saved=1");
 }
 
@@ -113,6 +122,7 @@ export async function saveScheduleItem(
     return { error: "We could not save this schedule entry. Try again." };
   }
 
+  invalidateWeddingContent();
   redirect("/admin/schedule?saved=1");
 }
 
@@ -124,6 +134,7 @@ export async function deleteScheduleItem(formData: FormData) {
   const supabase = await createSupabaseServerClient();
   const { error } = await supabase.from("schedule_items").delete().eq("id", id);
   if (error) redirect("/admin/schedule?error=delete");
+  invalidateWeddingContent();
   redirect("/admin/schedule?deleted=1");
 }
 
@@ -156,10 +167,13 @@ export async function moveScheduleItem(formData: FormData) {
     .from("schedule_items")
     .update({ sort_order: adjacentOrder, updated_at: new Date().toISOString() })
     .eq("id", id);
+  // Invalidate each committed write: the second update may fail or throw.
+  if (!first.error) invalidateWeddingContent();
   const second = await supabase
     .from("schedule_items")
     .update({ sort_order: currentOrder, updated_at: new Date().toISOString() })
     .eq("id", adjacentId);
+  if (!second.error) invalidateWeddingContent();
 
   if (first.error || second.error) redirect("/admin/schedule?error=reorder");
   redirect("/admin/schedule?reordered=1");

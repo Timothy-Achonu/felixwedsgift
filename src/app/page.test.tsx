@@ -41,4 +41,19 @@ describe("home page", () => {
       5,
     );
   });
+
+  it("uses independent desktop and phone focal positions and cover-aware sizes", async () => {
+    const { container } = render(await Home());
+    const picture = container.querySelector("picture")!;
+    const source = picture.querySelector("source")!;
+    const img = picture.querySelector("img")!;
+    expect(source.getAttribute("sizes")).toMatch(/^max\(100vw, [\d.]+svh\)$/);
+    expect(img.getAttribute("sizes")).toMatch(/^max\(100vw, [\d.]+svh\)$/);
+    expect(img.style.getPropertyValue("--hero-mobile-position")).not.toBe("");
+    expect(img.style.getPropertyValue("--hero-desktop-position")).not.toBe("");
+    expect(img.className).toContain(
+      "md:object-[position:var(--hero-desktop-position)]",
+    );
+    expect(img).toHaveAttribute("loading", "eager");
+  });
 });

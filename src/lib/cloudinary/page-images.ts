@@ -3,6 +3,10 @@ import "server-only";
 import { createHash, randomUUID } from "node:crypto";
 
 import { env } from "@/env";
+import {
+  maximumPageImageBytes,
+  pageImageFormats,
+} from "@/lib/images/page-images";
 
 function credentials() {
   const cloudName = env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
@@ -44,6 +48,8 @@ export type VerifiedCloudinaryImage = {
   secureUrl: string;
   width: number;
   height: number;
+  format: string;
+  bytes: number;
 };
 
 export async function verifyPageImage(
@@ -73,6 +79,8 @@ export async function verifyPageImage(
   const secureUrl = record.secure_url;
   const width = record.width;
   const height = record.height;
+  const format = record.format;
+  const bytes = record.bytes;
   if (
     record.public_id !== publicId ||
     typeof secureUrl !== "string" ||
@@ -81,12 +89,20 @@ export async function verifyPageImage(
     ) ||
     typeof width !== "number" ||
     typeof height !== "number" ||
+    !Number.isInteger(width) ||
+    !Number.isInteger(height) ||
+    typeof format !== "string" ||
+    !pageImageFormats.includes(format) ||
+    typeof bytes !== "number" ||
+    !Number.isInteger(bytes) ||
+    bytes < 1 ||
+    bytes > maximumPageImageBytes ||
     width < 1 ||
     height < 1
   ) {
     throw new Error("Cloudinary returned an unexpected image asset.");
   }
-  return { publicId, secureUrl, width, height };
+  return { publicId, secureUrl, width, height, format, bytes };
 }
 
 export async function destroyPageImage(publicId: string) {

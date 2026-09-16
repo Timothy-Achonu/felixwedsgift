@@ -8,6 +8,7 @@ import {
 import Image, { getImageProps } from "next/image";
 import Link from "next/link";
 import type { Metadata } from "next";
+import type { CSSProperties } from "react";
 
 import { WeddingCountdown } from "@/components/wedding/countdown";
 import { PhotoUploadDemo } from "@/components/wedding/photo-upload-demo";
@@ -16,6 +17,7 @@ import { SiteHeader } from "@/components/wedding/site-header";
 import { WeddingGallery } from "@/components/wedding/wedding-gallery";
 import { getWeddingContent } from "@/data/wedding";
 import { getPublicWeddingMetadata } from "@/lib/wedding/metadata";
+import { heroImageSizes } from "@/lib/images/page-images";
 
 export async function generateMetadata(): Promise<Metadata> {
   const wedding = await getWeddingContent();
@@ -26,7 +28,16 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function Home() {
   const wedding = await getWeddingContent();
   const coupleName = `${wedding.couple.partnerOne} & ${wedding.couple.partnerTwo}`;
-  const commonHeroProps = { alt: wedding.hero.image.alt, sizes: "100vw" };
+  const commonHeroProps = {
+    alt: wedding.hero.image.alt,
+    quality: 85,
+    loading: "eager" as const,
+    fetchPriority: "high" as const,
+  };
+  const desktopHeroSizes = heroImageSizes(
+    wedding.hero.image.width,
+    wedding.hero.image.height,
+  );
   const {
     props: { srcSet: desktopHeroSrcSet },
   } = getImageProps({
@@ -34,14 +45,17 @@ export default async function Home() {
     src: wedding.hero.image.src,
     width: wedding.hero.image.width,
     height: wedding.hero.image.height,
-    priority: true,
+    sizes: desktopHeroSizes,
   });
   const { props: mobileHeroProps } = getImageProps({
     ...commonHeroProps,
     src: wedding.hero.mobileImage.src,
     width: wedding.hero.mobileImage.width,
     height: wedding.hero.mobileImage.height,
-    priority: true,
+    sizes: heroImageSizes(
+      wedding.hero.mobileImage.width,
+      wedding.hero.mobileImage.height,
+    ),
   });
 
   return (
@@ -52,14 +66,21 @@ export default async function Home() {
       >
         <SiteHeader />
         <picture>
-          <source media="(min-width: 768px)" srcSet={desktopHeroSrcSet} />
+          <source
+            media="(min-width: 768px)"
+            srcSet={desktopHeroSrcSet}
+            sizes={desktopHeroSizes}
+          />
           <img
             {...mobileHeroProps}
             alt={wedding.hero.image.alt}
-            className="absolute inset-0 size-full animate-[hero-image-in_1.4s_cubic-bezier(0.2,0.7,0.2,1)_both] object-cover"
-            style={{
-              objectPosition: `${(wedding.hero.mobileImage.focalX ?? 0.58) * 100}% ${(wedding.hero.mobileImage.focalY ?? 0.5) * 100}%`,
-            }}
+            className="absolute inset-0 size-full animate-[hero-image-in_1.4s_cubic-bezier(0.2,0.7,0.2,1)_both] object-cover object-[position:var(--hero-mobile-position)] md:object-[position:var(--hero-desktop-position)]"
+            style={
+              {
+                "--hero-mobile-position": `${(wedding.hero.mobileImage.focalX ?? 0.58) * 100}% ${(wedding.hero.mobileImage.focalY ?? 0.5) * 100}%`,
+                "--hero-desktop-position": `${(wedding.hero.image.focalX ?? 0.5) * 100}% ${(wedding.hero.image.focalY ?? 0.5) * 100}%`,
+              } as CSSProperties
+            }
           />
         </picture>
         <div

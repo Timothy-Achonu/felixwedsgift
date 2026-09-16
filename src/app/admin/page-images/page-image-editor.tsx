@@ -3,10 +3,14 @@
 import { useEffect, useState } from "react";
 
 import type { PageImageRow, PageImageSlot } from "@/data/page-images";
+import {
+  maximumPageImageBytes,
+  pageImageMimeTypes,
+} from "@/lib/images/page-images";
 import type { WeddingPhoto } from "@/types/wedding";
 
 import { adminStyles } from "../admin-styles";
-import { cropHeroFile, heroCropSizes } from "./crop";
+import { validatePageImageFile } from "./validate-file";
 
 type Entry = {
   slot: PageImageSlot;
@@ -20,12 +24,12 @@ const labels: Record<PageImageSlot, { title: string; advice: string }> = {
   hero_desktop: {
     title: "Hero - desktop",
     advice:
-      "Frame a wide 16:9 composition. The finished crop is 1600 x 900 pixels.",
+      "Frame a wide 16:9 composition. Use at least 1600 x 900 pixels; 3840 x 2160 or larger is recommended for sharper screens. Your original is preserved.",
   },
   hero_mobile: {
     title: "Hero - phone",
     advice:
-      "Frame a tall 9:16 composition. Use the desktop source or select a different photo.",
+      "Frame a tall 9:16 composition. Use at least 900 x 1600 pixels; 1440 x 2560 or larger is recommended. Use the desktop source or select a different photo.",
   },
   story_primary: {
     title: "Story - main portrait",
@@ -51,9 +55,6 @@ const previewFrames: Record<PageImageSlot, string> = {
   venue: "aspect-[8/5]",
 };
 
-const acceptedTypes = new Set(["image/jpeg", "image/png", "image/webp"]);
-const maximumFileSize = 20 * 1024 * 1024;
-
 type UploadSignature = {
   cloudName: string;
   apiKey: string;
@@ -72,7 +73,7 @@ async function responseJson(
     : {};
 }
 
-async function uploadFile(file: File | Blob): Promise<string> {
+async function uploadFile(file: File): Promise<string> {
   const signResponse = await fetch("/api/admin/page-images/sign", {
     method: "POST",
   });
@@ -81,7 +82,7 @@ async function uploadFile(file: File | Blob): Promise<string> {
     throw new Error(String(signing.error ?? "Unable to authorize the upload."));
   const signature = signing as UploadSignature;
   const body = new FormData();
-  body.set("file", file, file instanceof File ? file.name : "hero-crop.jpg");
+  body.set("file", file, file.name);
   body.set("api_key", signature.apiKey);
   body.set("overwrite", signature.overwrite);
   body.set("public_id", signature.public_id);
@@ -139,12 +140,12 @@ function PhotoCard({
     setError("");
     setConfirmation("");
     if (!file) return;
-    if (!acceptedTypes.has(file.type)) {
+    if (!pageImageMimeTypes.includes(file.type)) {
       setError("Choose a JPEG, PNG or WebP photograph.");
       return;
     }
-    if (file.size > maximumFileSize) {
-      setError("Choose a photograph smaller than 20 MB.");
+    if (file.size === 0 || file.size > maximumPageImageBytes) {
+      setError("Choose a non-empty photograph no larger than 10 MB.");
       return;
     }
     const next = { file, url: URL.createObjectURL(file) };
@@ -177,14 +178,8 @@ function PhotoCard({
     try {
       let publicId = saved?.cloudinary_public_id ?? "";
       if (source) {
-        const file =
-          slot === "hero_desktop" || slot === "hero_mobile"
-            ? await cropHeroFile(source.file, heroCropSizes[slot], {
-                x: x / 100,
-                y: y / 100,
-              })
-            : source.file;
-        publicId = await uploadFile(file);
+        await validatePageImageFile(source.file, slot);
+        publicId = await uploadFile(source.file);
         uploadedPublicId = publicId;
       }
       const response = await fetch("/api/admin/page-images", {
@@ -271,7 +266,7 @@ function PhotoCard({
           </div>
           <p className="text-wedding-navy/62 mt-2 mb-0 text-xs leading-5">
             {slot.startsWith("hero_")
-              ? "Adjust the crop before upload; the public hero will still cover slightly different screen shapes."
+              ? "Your original stays intact. You can change framing after saving; the public hero adapts to each screen's shape."
               : "The source photo stays intact; the focal point controls cover framing."}
           </p>
         </div>

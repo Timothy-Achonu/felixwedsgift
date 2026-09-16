@@ -58,7 +58,9 @@ The Supabase names use the current publishable and secret key model. `SUPABASE_S
 
 ## Admin Page Images
 
-The `/admin/page-images` editor controls the desktop and phone hero crops, both story photographs, and the venue photograph. Save the desktop hero first; its image description is shared by both hero crops. It does not edit the guest gallery. Admin uploads go directly to Cloudinary using a server-authorized signed request; asset references and alt text are saved in Supabase.
+The `/admin/page-images` editor controls desktop and phone hero framing, both story photographs, and the venue photograph. Save the desktop hero first; its image description is shared by both hero compositions. It does not edit the guest gallery. Admin uploads preserve the original file and go directly to Cloudinary using a server-authorized signed request; asset references, focal positions, and alt text are saved in Supabase. Uploads accept JPEG, PNG, or WebP up to 10 MB and 8192 pixels per side.
+
+Public content uses tagged server-side caching, invalidated after admin changes. Next.js/Vercel separately caches optimized image delivery for at least 31 days; replacement uploads use new URLs. Existing compressed hero uploads need re-uploading from the original to recover quality. See [image quality, caching, and cost policy](docs/IMAGE-QUALITY-AND-COSTS.md) for validation, guest-photo requirements, budget assumptions, and production verification.
 
 Apply `supabase/migrations/20260915000100_create_page_images.sql` to the wedding Supabase project. To enable uploads, set these values in `.env.local` and in the deployment environment, then restart or redeploy:
 

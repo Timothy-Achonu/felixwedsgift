@@ -2,15 +2,15 @@ import { describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
   isSupabaseConfigured: vi.fn(),
-  createSupabaseServerClient: vi.fn(),
+  createSupabasePublicClient: vi.fn(),
 }));
 
 vi.mock("@/lib/supabase/config", () => ({
   isSupabaseConfigured: mocks.isSupabaseConfigured,
 }));
 
-vi.mock("@/lib/supabase/server", () => ({
-  createSupabaseServerClient: mocks.createSupabaseServerClient,
+vi.mock("@/lib/supabase/public", () => ({
+  createSupabasePublicClient: mocks.createSupabasePublicClient,
 }));
 
 import { getWeddingContent } from "./wedding";
@@ -23,7 +23,7 @@ describe("wedding content adapter", () => {
     const wedding = await getWeddingContent();
 
     expect(wedding.isMock).toBe(true);
-    expect(mocks.createSupabaseServerClient).not.toHaveBeenCalled();
+    expect(mocks.createSupabasePublicClient).not.toHaveBeenCalled();
   });
 
   it("maps published settings and ordered schedule rows", async () => {
@@ -99,7 +99,7 @@ describe("wedding content adapter", () => {
       error: null,
     });
 
-    mocks.createSupabaseServerClient.mockResolvedValue({
+    mocks.createSupabasePublicClient.mockReturnValue({
       from: vi.fn((table: string) =>
         table === "wedding_settings"
           ? settingsQuery
@@ -129,5 +129,17 @@ describe("wedding content adapter", () => {
         description: "The vows.",
       },
     ]);
+  });
+
+  it("returns not found after unpublishing instead of retaining an old ISR page", async () => {
+    mocks.isSupabaseConfigured.mockReturnValue(true);
+    const query = { select: vi.fn(), eq: vi.fn(), maybeSingle: vi.fn() };
+    query.select.mockReturnValue(query);
+    query.eq.mockReturnValue(query);
+    query.maybeSingle.mockResolvedValue({ data: null, error: null });
+    mocks.createSupabasePublicClient.mockReturnValue({ from: () => query });
+    await expect(getWeddingContent()).rejects.toThrow(
+      "NEXT_HTTP_ERROR_FALLBACK;404",
+    );
   });
 });

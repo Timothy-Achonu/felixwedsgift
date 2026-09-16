@@ -6,6 +6,7 @@ const mocks = vi.hoisted(() => ({
   verifyPageImage: vi.fn(),
   destroyPageImage: vi.fn(),
   revalidatePath: vi.fn(),
+  revalidateTag: vi.fn(),
 }));
 
 vi.mock("@/lib/auth/admin", () => ({
@@ -18,7 +19,10 @@ vi.mock("@/lib/cloudinary/page-images", () => ({
   verifyPageImage: mocks.verifyPageImage,
   destroyPageImage: mocks.destroyPageImage,
 }));
-vi.mock("next/cache", () => ({ revalidatePath: mocks.revalidatePath }));
+vi.mock("next/cache", () => ({
+  revalidatePath: mocks.revalidatePath,
+  revalidateTag: mocks.revalidateTag,
+}));
 
 import { DELETE, POST } from "./route";
 
@@ -79,37 +83,55 @@ describe("admin page-image persistence", () => {
     expect(mocks.createSupabaseServerClient).not.toHaveBeenCalled();
   });
 
-  it("saves a provider-verified asset in an empty slot", async () => {
-    const read = { select: vi.fn(), eq: vi.fn(), maybeSingle: vi.fn() };
-    const write = { insert: vi.fn(), select: vi.fn(), maybeSingle: vi.fn() };
-    read.select.mockReturnValue(read);
-    read.eq.mockReturnValue(read);
-    read.maybeSingle.mockResolvedValue({ data: null, error: null });
-    write.insert.mockReturnValue(write);
-    write.select.mockReturnValue(write);
-    write.maybeSingle.mockResolvedValue({
-      data: { slot: "hero_desktop" },
-      error: null,
-    });
-    mocks.createSupabaseServerClient.mockResolvedValue({
-      from: vi.fn().mockReturnValueOnce(read).mockReturnValueOnce(write),
-    });
+  it.each([
+    [1600, 900],
+    [4000, 3000],
+  ])(
+    "saves legacy crops and original sources (%i x %i)",
+    async (width, height) => {
+      mocks.verifyPageImage.mockResolvedValue({
+        publicId,
+        secureUrl,
+        width,
+        height,
+        format: "jpg",
+        bytes: 5_000_000,
+      });
+      const read = { select: vi.fn(), eq: vi.fn(), maybeSingle: vi.fn() };
+      const write = { insert: vi.fn(), select: vi.fn(), maybeSingle: vi.fn() };
+      read.select.mockReturnValue(read);
+      read.eq.mockReturnValue(read);
+      read.maybeSingle.mockResolvedValue({ data: null, error: null });
+      write.insert.mockReturnValue(write);
+      write.select.mockReturnValue(write);
+      write.maybeSingle.mockResolvedValue({
+        data: { slot: "hero_desktop" },
+        error: null,
+      });
+      mocks.createSupabaseServerClient.mockResolvedValue({
+        from: vi.fn().mockReturnValueOnce(read).mockReturnValueOnce(write),
+      });
 
-    const response = await POST(saveRequest());
+      const response = await POST(saveRequest());
 
-    expect(response.status).toBe(200);
-    expect(mocks.verifyPageImage).toHaveBeenCalledWith(publicId);
-    expect(write.insert).toHaveBeenCalledWith(
-      expect.objectContaining({
-        slot: "hero_desktop",
-        cloudinary_public_id: publicId,
-        secure_url: secureUrl,
-        alt: "A couple together",
-      }),
-    );
-    expect(mocks.revalidatePath).toHaveBeenCalledWith("/");
-    expect(mocks.destroyPageImage).not.toHaveBeenCalled();
-  });
+      expect(response.status).toBe(200);
+      expect(mocks.verifyPageImage).toHaveBeenCalledWith(publicId);
+      expect(write.insert).toHaveBeenCalledWith(
+        expect.objectContaining({
+          slot: "hero_desktop",
+          cloudinary_public_id: publicId,
+          secure_url: secureUrl,
+          alt: "A couple together",
+        }),
+      );
+      expect(mocks.revalidatePath).toHaveBeenCalledWith("/");
+      expect(mocks.revalidatePath).toHaveBeenCalledWith("/gallery");
+      expect(mocks.revalidateTag).toHaveBeenCalledWith("wedding-content", {
+        expire: 0,
+      });
+      expect(mocks.destroyPageImage).not.toHaveBeenCalled();
+    },
+  );
 
   it("rejects stale editors before checking a new Cloudinary asset", async () => {
     const read = { select: vi.fn(), eq: vi.fn(), maybeSingle: vi.fn() };
@@ -135,7 +157,7 @@ describe("admin page-image persistence", () => {
     expect(mocks.destroyPageImage).not.toHaveBeenCalled();
   });
 
-  it("rejects a hero upload that missed the finished crop dimensions", async () => {
+  it("rejects a hero source that would need enlargement", async () => {
     const read = { select: vi.fn(), eq: vi.fn(), maybeSingle: vi.fn() };
     read.select.mockReturnValue(read);
     read.eq.mockReturnValue(read);
@@ -146,14 +168,15 @@ describe("admin page-image persistence", () => {
     mocks.verifyPageImage.mockResolvedValue({
       publicId,
       secureUrl,
-      width: 2000,
-      height: 1600,
+      width: 1200,
+      height: 800,
     });
 
     const response = await POST(saveRequest());
 
     expect(response.status).toBe(400);
     expect(mocks.destroyPageImage).not.toHaveBeenCalled();
+    expect(mocks.revalidateTag).not.toHaveBeenCalled();
   });
 
   it("requires the desktop hero before saving a phone crop", async () => {
@@ -203,5 +226,89 @@ describe("admin page-image persistence", () => {
 
     expect(response.status).toBe(409);
     expect(mocks.destroyPageImage).not.toHaveBeenCalled();
+  });
+
+  it.each([false, true])(
+    "only removes an unreferenced superseded original (still used=%s)",
+    async (inUse) => {
+      const oldId = "wedding/page/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa";
+      const read = { select: vi.fn(), eq: vi.fn(), maybeSingle: vi.fn() };
+      read.select.mockReturnValue(read);
+      read.eq.mockReturnValue(read);
+      read.maybeSingle.mockResolvedValue({
+        data: {
+          cloudinary_public_id: oldId,
+          secure_url: secureUrl,
+          width: 1600,
+          height: 900,
+        },
+        error: null,
+      });
+      const write = {
+        update: vi.fn(),
+        eq: vi.fn(),
+        select: vi.fn(),
+        maybeSingle: vi.fn(),
+      };
+      write.update.mockReturnValue(write);
+      write.eq.mockReturnValue(write);
+      write.select.mockReturnValue(write);
+      write.maybeSingle.mockResolvedValue({
+        data: { slot: "hero_desktop" },
+        error: null,
+      });
+      const references = { select: vi.fn(), eq: vi.fn(), limit: vi.fn() };
+      references.select.mockReturnValue(references);
+      references.eq.mockReturnValue(references);
+      references.limit.mockResolvedValue({
+        data: inUse ? [{ slot: "hero_mobile" }] : [],
+        error: null,
+      });
+      mocks.createSupabaseServerClient.mockResolvedValue({
+        from: vi
+          .fn()
+          .mockReturnValueOnce(read)
+          .mockReturnValueOnce(write)
+          .mockReturnValueOnce(references),
+      });
+
+      expect((await POST(saveRequest(oldId))).status).toBe(200);
+      expect(mocks.revalidateTag).toHaveBeenCalledWith("wedding-content", {
+        expire: 0,
+      });
+      if (inUse) expect(mocks.destroyPageImage).not.toHaveBeenCalled();
+      else expect(mocks.destroyPageImage).toHaveBeenCalledWith(oldId);
+    },
+  );
+
+  it("does not destroy a competing session's committed asset during rollback", async () => {
+    const read = { select: vi.fn(), eq: vi.fn(), maybeSingle: vi.fn() };
+    read.select.mockReturnValue(read);
+    read.eq.mockReturnValue(read);
+    read.maybeSingle.mockResolvedValue({ data: null, error: null });
+    const write = { insert: vi.fn(), select: vi.fn(), maybeSingle: vi.fn() };
+    write.insert.mockReturnValue(write);
+    write.select.mockReturnValue(write);
+    write.maybeSingle.mockResolvedValue({
+      data: null,
+      error: { message: "conflict" },
+    });
+    const references = { select: vi.fn(), eq: vi.fn(), limit: vi.fn() };
+    references.select.mockReturnValue(references);
+    references.eq.mockReturnValue(references);
+    references.limit.mockResolvedValue({
+      data: [{ slot: "hero_desktop" }],
+      error: null,
+    });
+    mocks.createSupabaseServerClient.mockResolvedValue({
+      from: vi
+        .fn()
+        .mockReturnValueOnce(read)
+        .mockReturnValueOnce(write)
+        .mockReturnValueOnce(references),
+    });
+    expect((await POST(saveRequest())).status).toBe(409);
+    expect(mocks.destroyPageImage).not.toHaveBeenCalled();
+    expect(mocks.revalidateTag).not.toHaveBeenCalled();
   });
 });
