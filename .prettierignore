@@ -1,4 +1,7 @@
 .next
+.codex
+.cursor/skills
+.opencode/skills
 coverage
 node_modules
 package-lock.json
