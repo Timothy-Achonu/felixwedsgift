@@ -23,7 +23,12 @@ function configuredCloudinary() {
 export function signGuestPhotoUpload(publicId: string) {
   const { cloud_name, api_key, api_secret } = configuredCloudinary();
   const timestamp = Math.floor(Date.now() / 1000);
-  const parameters = { overwrite: false, public_id: publicId, timestamp };
+  const parameters = {
+    overwrite: false,
+    public_id: publicId,
+    timestamp,
+    type: "authenticated" as const,
+  };
   return {
     cloudName: cloud_name,
     apiKey: api_key,

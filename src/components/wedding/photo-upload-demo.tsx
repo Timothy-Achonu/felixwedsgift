@@ -28,6 +28,7 @@ type Authorization = {
   public_id: string;
   timestamp: number;
   signature: string;
+  type: "authenticated";
 };
 
 async function imageDimensions(file: File) {
@@ -51,7 +52,7 @@ function uploadFile(
     const request = new XMLHttpRequest();
     request.open(
       "POST",
-      `https://api.cloudinary.com/v1_1/${encodeURIComponent(authorization.cloudName)}/image/authenticated`,
+      `https://api.cloudinary.com/v1_1/${encodeURIComponent(authorization.cloudName)}/image/upload`,
     );
     request.upload.onprogress = (event) =>
       event.lengthComputable &&
@@ -67,6 +68,7 @@ function uploadFile(
     body.set("overwrite", String(authorization.overwrite));
     body.set("public_id", authorization.public_id);
     body.set("timestamp", String(authorization.timestamp));
+    body.set("type", authorization.type);
     body.set("signature", authorization.signature);
     request.send(body);
   });
@@ -176,11 +178,16 @@ export function PhotoUploadDemo() {
       if (!response.ok || !result.uploads)
         throw new Error(result.error ?? "We couldn't prepare your photos.");
       const uploaded: Preview[] = [];
+      let authorizationMissing = false;
       for (const preview of pending) {
         const authorization = result.uploads.find(
           ({ id }) => id === preview.id,
         );
-        if (!authorization) continue;
+        if (!authorization) {
+          authorizationMissing = true;
+          update(preview.id, { state: "failed" });
+          continue;
+        }
         update(preview.id, { state: "uploading", progress: 0 });
         try {
           await uploadFile(preview, authorization, (progress) =>
@@ -194,7 +201,12 @@ export function PhotoUploadDemo() {
           uploaded.push(preview);
         }
       }
-      if (uploaded.length) {
+      if (!uploaded.length) {
+        setError("Some photos could not be sent. Retry the failed photos.");
+        return;
+      }
+      let completionResults: Array<{ id: string; ok: boolean }> = [];
+      try {
         const completion = await fetch("/api/photos/complete", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -205,23 +217,29 @@ export function PhotoUploadDemo() {
         const result = (await completion.json()) as {
           results?: Array<{ id: string; ok: boolean }>;
         };
+        if (!completion.ok || !Array.isArray(result.results))
+          throw new Error("The server returned an invalid upload result.");
+        completionResults = result.results;
+      } catch {
         uploaded.forEach(({ id }) =>
-          update(id, {
-            state: result.results?.find((item) => item.id === id)?.ok
-              ? "complete"
-              : "failed",
-            progress: 100,
-          }),
+          update(id, { state: "failed", progress: 100 }),
         );
+        setError("Some photos could not be sent. Retry the failed photos.");
+        return;
       }
-      window.setTimeout(() => {
-        const hasFailures = previewsRef.current.some(
-          ({ state }) => state === "failed",
-        );
-        if (hasFailures)
-          setError("Some photos could not be sent. Retry the failed photos.");
-        else setSuccess(true);
-      }, 0);
+      let completionFailed = authorizationMissing;
+      uploaded.forEach(({ id }) => {
+        const completed =
+          completionResults.find((item) => item.id === id)?.ok === true;
+        if (!completed) completionFailed = true;
+        update(id, {
+          state: completed ? "complete" : "failed",
+          progress: 100,
+        });
+      });
+      if (completionFailed)
+        setError("Some photos could not be sent. Retry the failed photos.");
+      else setSuccess(true);
     } catch (uploadError) {
       setError(
         uploadError instanceof Error
