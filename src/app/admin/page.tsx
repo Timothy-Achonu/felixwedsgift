@@ -23,8 +23,10 @@ const overviewModules = [
   {
     icon: Camera,
     label: "Photo moderation",
-    status: "Coming next",
+    status: "Available now",
     description: "Review and curate guest photographs.",
+    href: "/admin/photos",
+    actionLabel: "Review photographs",
   },
 ];
 
@@ -41,7 +43,7 @@ export default async function AdminPage() {
           </h1>
           <p className={adminStyles.contentCopy}>
             Your workspace is ready. Manage the wedding details and schedule
-            here, with guest photo moderation coming next.
+            here, including guest photo review and approval.
           </p>
         </div>
 

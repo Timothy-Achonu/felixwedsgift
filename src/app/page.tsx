@@ -392,8 +392,9 @@ export default async function Home() {
                 </h2>
               </div>
               <p className="text-wedding-brown m-0 max-w-[31rem] text-[0.9rem] leading-[1.75]">
-                A preview collection for the experience. These photographs are
-                mock imagery and will be replaced before launch.
+                {wedding.isMock
+                  ? "A preview collection for the experience. These photographs are mock imagery and will be replaced before launch."
+                  : "A small selection of guest photographs, reviewed before they join the wedding album."}
               </p>
             </Reveal>
           </div>

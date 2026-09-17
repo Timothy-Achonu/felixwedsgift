@@ -4,7 +4,7 @@ The Next.js foundation for Felix and Gift's wedding website. Product requirement
 
 ## Current Phase
 
-The public invitation and mock gallery are in place. Supabase powers admin authentication, wedding details, and the schedule. Admin-managed page images are connected to Cloudinary and Supabase; guest uploads and photo moderation are still prototypes or deferred.
+The public invitation, guest uploads, moderated gallery, and admin workspace are in place. Supabase powers authentication and content records; Cloudinary stores page images and guest-photo originals. Guest photographs remain private until an administrator approves them.
 
 ## Stack
 
@@ -16,7 +16,7 @@ The public invitation and mock gallery are in place. Supabase powers admin authe
 - Vitest and Testing Library
 - npm on Node.js 24 LTS
 
-Supabase is the database and administrator-authentication platform. Cloudinary stores and delivers admin-managed page images through its REST API; guest-photo integration is still forthcoming.
+Supabase is the database and administrator-authentication platform. Cloudinary stores and delivers admin-managed page images and guest photographs through signed upload and management APIs.
 
 ## Local Development
 
@@ -54,7 +54,7 @@ Open [http://localhost:3000](http://localhost:3000).
 
 Copy `.env.example` to `.env.local` when an integration phase needs credentials. All entries are optional during the foundation phase, but values are validated when present.
 
-The Supabase names use the current publishable and secret key model. `SUPABASE_SECRET_KEY`, `CLOUDINARY_API_KEY`, and `CLOUDINARY_API_SECRET` are server-only values and must never be imported into browser code.
+The Supabase names use the current publishable and secret key model. `SUPABASE_SECRET_KEY`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`, and `UPLOAD_RATE_LIMIT_SECRET` are server-only values and must never be imported into browser code.
 
 ## Admin Page Images
 
@@ -69,6 +69,14 @@ Apply `supabase/migrations/20260915000100_create_page_images.sql` to the wedding
 - `CLOUDINARY_API_SECRET`: the Cloudinary API secret, server-only.
 
 No browser localStorage entries or unsigned upload preset are required. The current stock photographs remain as labeled placeholders until admins replace each slot.
+
+## Guest Photographs
+
+Apply `supabase/migrations/20260916000100_create_guest_photos.sql` after the page-image migration. Guest uploads accept batches of up to ten JPEG, PNG, or WebP files, each no larger than 10 MB or 8192 pixels on either side. The browser uploads directly with short-lived signed Cloudinary parameters; the server verifies provider metadata before recording each photo as `PENDING`.
+
+Set `UPLOAD_RATE_LIMIT_SECRET` to a random value of at least 32 characters. It hashes the anonymous device cookie and deployment-provided IP address used for the 30-per-device and 200-per-IP hourly limits. `SUPABASE_SECRET_KEY` is also required for reservation and completion routes. The feature fails closed when either value is absent.
+
+Administrators review photos at `/admin/photos`, can edit captions, approve or reject individually or in bulk, download originals, and permanently delete individual photos. Only `APPROVED` rows pass public RLS and appear in the paginated gallery. Pending and rejected Cloudinary assets use authenticated delivery; approval intentionally makes the exact original public so only one source asset is stored.
 
 ## Architecture Boundaries
 

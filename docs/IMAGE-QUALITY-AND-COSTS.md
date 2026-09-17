@@ -46,11 +46,12 @@ Every replacement has a new Cloudinary public ID and URL. Metadata-only edits
 keep the URL. Data tags do not purge optimized image bytes. No custom fetch proxy
 or second Cloudinary delivery compression step is introduced.
 
-## Guest photographs: policy for the later implementation phase
+## Guest photographs
 
-The current guest uploader remains a demo. Plan for up to 500 photos and fewer
-than 5,000 total site visits in the busiest 30 days. Keep exact originals until an
-administrator explicitly removes them; do not automatically delete memories.
+The guest uploader supports up to 500 retained photos and is designed for fewer
+than 5,000 total site visits in the busiest 30 days. Exact originals remain until
+an administrator explicitly removes them; the application does not automatically
+delete completed memories.
 
 - Allow ten files per batch, each at most 10 MB, in JPEG, PNG, or WebP. Apply type,
   byte, and dimension checks before uploading and verify provider metadata before
@@ -61,13 +62,19 @@ administrator explicitly removes them; do not automatically delete memories.
 - Use Vercel delivery with thumbnail widths 320/640/960 and lightbox widths
   1440/1920, quality 75. Cap each component's advertised variants accordingly;
   lazy-load and paginate the gallery. Never load original files into the grid.
-- Approval, rejection, deletion, caption changes, and reordering must invalidate
-  the public gallery tag after a committed change. Guest pending/private media
-  access and deletion of already-cached public bytes require an explicit access
-  and purge design before this phase ships; data invalidation alone is not
-  sufficient to revoke a previously public image URL.
-- Add upload reservations/idempotency and compensating cleanup so failed,
-  abandoned, or retried uploads do not silently accumulate chargeable assets.
+- Approval, rejection, deletion, and caption changes invalidate the public
+  gallery tag after a committed change. Pending and rejected originals use
+  Cloudinary authenticated delivery. Approval changes the exact original to
+  public delivery; rejection or deletion changes or destroys it with Cloudinary
+  CDN invalidation. The gallery immediately removes its database reference, but
+  Vercel does not expose a source-image purge API: a previously optimized copy
+  can remain at an already-known Vercel image URL until its cache TTL expires.
+  This is the explicit privacy/cost tradeoff accepted for the single-original
+  design; use separate public derivatives if immediate revocation becomes a hard
+  requirement.
+- Upload reservations are idempotent. Failed finalization removes the provider
+  asset, and later reservation requests opportunistically remove expired,
+  abandoned authenticated uploads in bounded batches.
 
 ## Budget and monitoring
 

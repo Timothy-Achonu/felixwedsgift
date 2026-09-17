@@ -6,6 +6,7 @@ export const serverEnvironmentSchema = {
   SUPABASE_SECRET_KEY: z.string().startsWith("sb_secret_").optional(),
   CLOUDINARY_API_KEY: optionalValue,
   CLOUDINARY_API_SECRET: optionalValue,
+  UPLOAD_RATE_LIMIT_SECRET: z.string().min(32).optional(),
 };
 
 export const clientEnvironmentSchema = {

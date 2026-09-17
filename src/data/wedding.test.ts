@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 const mocks = vi.hoisted(() => ({
   isSupabaseConfigured: vi.fn(),
   createSupabasePublicClient: vi.fn(),
+  getApprovedPhotos: vi.fn(),
 }));
 
 vi.mock("@/lib/supabase/config", () => ({
@@ -11,6 +12,10 @@ vi.mock("@/lib/supabase/config", () => ({
 
 vi.mock("@/lib/supabase/public", () => ({
   createSupabasePublicClient: mocks.createSupabasePublicClient,
+}));
+
+vi.mock("@/lib/photos/public", () => ({
+  getApprovedPhotos: mocks.getApprovedPhotos,
 }));
 
 import { getWeddingContent } from "./wedding";
@@ -28,6 +33,7 @@ describe("wedding content adapter", () => {
 
   it("maps published settings and ordered schedule rows", async () => {
     mocks.isSupabaseConfigured.mockReturnValue(true);
+    mocks.getApprovedPhotos.mockResolvedValue({ photos: [], nextCursor: null });
 
     const settingsQuery = {
       select: vi.fn(),

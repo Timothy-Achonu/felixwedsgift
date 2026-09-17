@@ -4,6 +4,7 @@ import type { WeddingContent } from "@/types/wedding";
 
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { createSupabasePublicClient } from "@/lib/supabase/public";
+import { getApprovedPhotos } from "@/lib/photos/public";
 
 import { mockWeddingContent } from "./mock-wedding";
 import { pagePhoto, type PageImageRow } from "./page-images";
@@ -98,6 +99,7 @@ export async function getWeddingContent(): Promise<WeddingContent> {
   const images = new Map(
     (pageImages ?? []).map((row) => [row.slot, pagePhoto(row)]),
   );
+  const { photos: gallery } = await getApprovedPhotos(5);
 
   return {
     ...mockWeddingContent,
@@ -147,5 +149,6 @@ export async function getWeddingContent(): Promise<WeddingContent> {
       title: item.title,
       ...(item.description ? { description: item.description } : {}),
     })),
+    gallery,
   };
 }

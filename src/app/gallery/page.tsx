@@ -3,8 +3,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { SiteHeader } from "@/components/wedding/site-header";
-import { WeddingGallery } from "@/components/wedding/wedding-gallery";
+import { GalleryWall } from "@/components/wedding/gallery-wall";
 import { getWeddingContent } from "@/data/wedding";
+import { getApprovedPhotos } from "@/lib/photos/public";
 import { getPublicWeddingMetadata } from "@/lib/wedding/metadata";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -15,6 +16,9 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function GalleryPage() {
   const wedding = await getWeddingContent();
+  const gallery = wedding.isMock
+    ? { photos: wedding.gallery, nextCursor: null }
+    : await getApprovedPhotos(24);
 
   return (
     <main className="bg-wedding-paper min-h-screen">
@@ -38,16 +42,25 @@ export default async function GalleryPage() {
             </p>
             <span
               className="text-wedding-blue text-[0.7rem] font-[750] uppercase"
-              aria-label={`${wedding.gallery.length} photographs`}
+              aria-label={
+                wedding.isMock
+                  ? `${gallery.photos.length} photographs`
+                  : "Admin-approved wedding photographs"
+              }
             >
-              {String(wedding.gallery.length).padStart(2, "0")} photographs
+              {wedding.isMock
+                ? `${String(gallery.photos.length).padStart(2, "0")} photographs`
+                : "Approved photographs"}
             </span>
           </div>
         </div>
       </section>
 
       <section aria-label="Wedding photographs" className="min-h-80">
-        <WeddingGallery photos={wedding.gallery} variant="wall" />
+        <GalleryWall
+          initialPhotos={gallery.photos}
+          initialCursor={gallery.nextCursor}
+        />
       </section>
 
       <footer className="bg-wedding-brown text-wedding-cream py-10">

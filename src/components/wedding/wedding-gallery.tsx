@@ -142,7 +142,7 @@ export function WeddingGallery({ photos, variant }: WeddingGalleryProps) {
               ? "h-full"
               : "focus-visible:z-1 focus-visible:outline-offset-[-4px]"
           }`}
-          aria-label={`Open photo: ${photo.caption}`}
+          aria-label={`Open photo: ${photo.caption || photo.alt}`}
           onClick={() => openPhoto(index)}
         >
           {variant === "carousel" ? (

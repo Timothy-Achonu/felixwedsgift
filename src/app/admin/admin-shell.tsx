@@ -7,7 +7,8 @@ import { requireAdmin } from "@/lib/auth/admin";
 import { logout } from "./actions";
 import { adminStyles } from "./admin-styles";
 
-type ActiveSection = "overview" | "details" | "schedule" | "page-images";
+type ActiveSection =
+  "overview" | "details" | "schedule" | "page-images" | "photos";
 
 export async function AdminShell({
   activeSection,
@@ -44,11 +45,13 @@ export async function AdminShell({
             >
               Overview
             </Link>
-            <span
-              className={`${adminStyles.navLink} ${adminStyles.navDisabled}`}
+            <Link
+              className={`${adminStyles.navLink} ${activeSection === "photos" ? adminStyles.navActive : ""}`}
+              href="/admin/photos"
+              aria-current={activeSection === "photos" ? "page" : undefined}
             >
               Photos
-            </span>
+            </Link>
             <Link
               className={`${adminStyles.navLink} ${activeSection === "details" ? adminStyles.navActive : ""}`}
               href="/admin/details"

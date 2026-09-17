@@ -15,6 +15,7 @@ export const env = createEnv({
       process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
     CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY,
     CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET,
+    UPLOAD_RATE_LIMIT_SECRET: process.env.UPLOAD_RATE_LIMIT_SECRET,
   },
   emptyStringAsUndefined: true,
 });

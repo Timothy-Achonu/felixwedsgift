@@ -12,11 +12,10 @@ describe("admin overview", () => {
   it("marks implemented modules as available and links to their pages", async () => {
     render(await AdminPage());
 
-    expect(screen.getAllByText("Available now")).toHaveLength(2);
-    expect(screen.getByText("Coming next")).toBeInTheDocument();
+    expect(screen.getAllByText("Available now")).toHaveLength(3);
     expect(
       screen.getByText(
-        "Your workspace is ready. Manage the wedding details and schedule here, with guest photo moderation coming next.",
+        "Your workspace is ready. Manage the wedding details and schedule here, including guest photo review and approval.",
       ),
     ).toBeInTheDocument();
     expect(
@@ -32,7 +31,12 @@ describe("admin overview", () => {
     }).parentElement;
     expect(photoCard).not.toBeNull();
     expect(
-      within(photoCard as HTMLElement).getByText("Coming next"),
+      within(photoCard as HTMLElement).getByText("Available now"),
     ).toBeInTheDocument();
+    expect(
+      within(photoCard as HTMLElement).getByRole("link", {
+        name: "Review photographs",
+      }),
+    ).toHaveAttribute("href", "/admin/photos");
   });
 });

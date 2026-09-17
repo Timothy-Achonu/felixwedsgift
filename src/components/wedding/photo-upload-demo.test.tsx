@@ -1,20 +1,50 @@
-import { act, fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { PhotoUploadDemo } from "@/components/wedding/photo-upload-demo";
 
-describe("photo upload prototype", () => {
+class SuccessfulUploadRequest {
+  status = 200;
+  upload = { onprogress: null as ((event: ProgressEvent) => void) | null };
+  onerror: (() => void) | null = null;
+  onload: (() => void) | null = null;
+
+  open() {}
+
+  send() {
+    this.upload.onprogress?.({
+      lengthComputable: true,
+      loaded: 1,
+      total: 1,
+    } as ProgressEvent);
+    this.onload?.();
+  }
+}
+
+describe("guest photo upload", () => {
   beforeEach(() => {
     vi.spyOn(URL, "createObjectURL").mockReturnValue("blob:photo-preview");
     vi.spyOn(URL, "revokeObjectURL").mockImplementation(() => undefined);
+    Object.defineProperty(HTMLImageElement.prototype, "decode", {
+      configurable: true,
+      value: vi.fn().mockResolvedValue(undefined),
+    });
+    Object.defineProperty(HTMLImageElement.prototype, "naturalWidth", {
+      configurable: true,
+      get: () => 1600,
+    });
+    Object.defineProperty(HTMLImageElement.prototype, "naturalHeight", {
+      configurable: true,
+      get: () => 1200,
+    });
   });
 
   afterEach(() => {
-    vi.useRealTimers();
+    vi.unstubAllGlobals();
     vi.restoreAllMocks();
   });
 
-  it("previews and removes a supported photo locally", () => {
+  it("previews and removes a supported photo locally", async () => {
     render(<PhotoUploadDemo />);
     const file = new File(["photo"], "moment.jpg", { type: "image/jpeg" });
 
@@ -22,8 +52,12 @@ describe("photo upload prototype", () => {
       target: { files: [file] },
     });
 
-    expect(screen.getByAltText("Preview of moment.jpg")).toBeInTheDocument();
-    expect(screen.getByText(/photos stay on this device/i)).toBeInTheDocument();
+    expect(
+      await screen.findByAltText("Preview of moment.jpg"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/approved photos may appear publicly/i),
+    ).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("button", { name: "Remove moment.jpg" }));
     expect(
@@ -32,7 +66,7 @@ describe("photo upload prototype", () => {
     expect(URL.revokeObjectURL).toHaveBeenCalledWith("blob:photo-preview");
   });
 
-  it("rejects unsupported file types", () => {
+  it("rejects unsupported file types", async () => {
     render(<PhotoUploadDemo />);
     const file = new File(["notes"], "notes.txt", { type: "text/plain" });
 
@@ -40,26 +74,60 @@ describe("photo upload prototype", () => {
       target: { files: [file] },
     });
 
-    expect(screen.getByRole("alert")).toHaveTextContent(
-      "Choose JPEG, PNG, or WebP photos only.",
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "notes.txt is not a JPEG, PNG, or WebP photo.",
     );
   });
 
-  it("completes the honest simulated progress flow", async () => {
-    vi.useFakeTimers();
+  it("uploads and submits a photo for admin review", async () => {
+    vi.stubGlobal("XMLHttpRequest", SuccessfulUploadRequest);
+    vi.stubGlobal(
+      "fetch",
+      vi
+        .fn()
+        .mockResolvedValueOnce(
+          new Response(
+            JSON.stringify({
+              uploads: [
+                {
+                  id: "00000000-0000-4000-8000-000000000001",
+                  cloudName: "wedding-cloud",
+                  apiKey: "key",
+                  overwrite: false,
+                  public_id: "wedding/guest/photo",
+                  timestamp: 1,
+                  signature: "signature",
+                },
+              ],
+            }),
+          ),
+        )
+        .mockResolvedValueOnce(
+          new Response(
+            JSON.stringify({
+              results: [
+                { id: "00000000-0000-4000-8000-000000000001", ok: true },
+              ],
+            }),
+          ),
+        ),
+    );
+    vi.spyOn(crypto, "randomUUID")
+      .mockReturnValueOnce("00000000-0000-4000-8000-000000000002")
+      .mockReturnValueOnce("00000000-0000-4000-8000-000000000001");
     render(<PhotoUploadDemo />);
     const file = new File(["photo"], "moment.jpg", { type: "image/jpeg" });
 
     fireEvent.change(screen.getByLabelText("Choose photos"), {
       target: { files: [file] },
     });
-    fireEvent.click(screen.getByRole("button", { name: "Preview upload" }));
+    fireEvent.click(
+      await screen.findByRole("button", { name: "Share photos for review" }),
+    );
 
-    await act(async () => {
-      await vi.runAllTimersAsync();
-    });
-
-    expect(screen.getByRole("status")).toHaveTextContent("Preview complete");
-    expect(screen.getByText(/no files left your device/i)).toBeInTheDocument();
+    expect(await screen.findByRole("status")).toHaveTextContent(
+      "Photos received",
+    );
+    expect(screen.getByText(/waiting for review/i)).toBeInTheDocument();
   });
 });
