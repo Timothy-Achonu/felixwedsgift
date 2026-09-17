@@ -134,4 +134,6 @@ export const adminStyles = {
     "cursor-pointer border-0 bg-transparent p-0 text-xs font-extrabold tracking-[0.05em] text-status-error uppercase underline underline-offset-4",
   secondaryButton:
     "cursor-pointer rounded-none border border-wedding-navy/24 bg-transparent px-4 py-3 text-xs font-extrabold tracking-[0.06em] text-wedding-navy uppercase transition-colors duration-180 hover:bg-wedding-navy hover:text-wedding-cream focus-visible:bg-wedding-navy focus-visible:text-wedding-cream disabled:cursor-wait disabled:opacity-60",
+  secondaryButtonActive:
+    "!border-wedding-navy !bg-wedding-navy !text-wedding-cream hover:!bg-wedding-navy hover:!text-wedding-cream",
 } as const;

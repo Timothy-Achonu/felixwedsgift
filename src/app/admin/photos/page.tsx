@@ -46,7 +46,8 @@ export default async function PhotosPage({
             <Link
               key={item}
               href={`/admin/photos?status=${item}`}
-              className={`${adminStyles.secondaryButton} ${status === item ? "bg-wedding-navy text-wedding-cream" : ""}`}
+              className={`${adminStyles.secondaryButton} ${status === item ? adminStyles.secondaryButtonActive : ""}`}
+              aria-current={status === item ? "page" : undefined}
             >
               {item.toLowerCase()}
             </Link>
