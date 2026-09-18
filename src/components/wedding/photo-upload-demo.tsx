@@ -2,11 +2,14 @@
 
 import {
   Check,
+  CircleAlert,
+  CircleX,
   ImagePlus,
+  Minimize2,
   RotateCcw,
   ShieldCheck,
   Trash2,
-  X,
+  Upload,
 } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useRef, useState, type ReactNode } from "react";
@@ -46,6 +49,7 @@ type Authorization = {
   signature: string;
   type: "authenticated";
 };
+type UploadPhase = "idle" | "preparing" | "uploading" | "finalizing" | "failed";
 
 async function imageDimensions(file: File) {
   const url = URL.createObjectURL(file);
@@ -143,6 +147,111 @@ function SuccessCopy({
   );
 }
 
+function UploadProgressTracker({
+  phase,
+  progress,
+  total,
+  completed,
+  error,
+  minimized,
+  onMinimize,
+  onExpand,
+}: {
+  phase: Exclude<UploadPhase, "idle">;
+  progress: number;
+  total: number;
+  completed: number;
+  error: string;
+  minimized: boolean;
+  onMinimize: () => void;
+  onExpand: () => void;
+}) {
+  const label =
+    phase === "preparing"
+      ? "Preparing your photos"
+      : phase === "finalizing"
+        ? "Saving your photos"
+        : phase === "failed"
+          ? "Upload needs attention"
+          : `Uploading ${completed} of ${total} photos`;
+  const detail =
+    phase === "preparing"
+      ? "Setting up a secure upload."
+      : phase === "finalizing"
+        ? "Your photos have uploaded and are being saved for review."
+        : phase === "failed"
+          ? error
+          : `${progress}% uploaded`;
+
+  if (minimized) {
+    return (
+      <button
+        type="button"
+        className="focus-ring bg-wedding-navy text-wedding-cream border-wedding-cream/25 fixed right-5 bottom-5 z-50 grid size-14 place-items-center rounded-full border shadow-[0_0.8rem_2rem_color-mix(in_srgb,var(--wedding-navy)_42%,transparent)]"
+        aria-label={`${label}. ${detail}. Expand upload progress.`}
+        onClick={onExpand}
+      >
+        <span
+          className="grid size-10 place-items-center rounded-full p-0.75"
+          style={{
+            background: `conic-gradient(var(--wedding-blue) ${progress}%, color-mix(in srgb, var(--wedding-cream) 24%, transparent) 0)`,
+          }}
+        >
+          <span className="bg-wedding-navy grid size-full place-items-center rounded-full text-[0.62rem] font-extrabold">
+            {phase === "failed" ? "!" : `${progress}%`}
+          </span>
+        </span>
+      </button>
+    );
+  }
+
+  return (
+    <section
+      className="bg-wedding-cream text-wedding-navy border-wedding-navy/16 fixed top-4 right-4 left-4 z-50 mx-auto w-[min(calc(100%-2rem),38rem)] border p-4 shadow-[0_0.9rem_2.5rem_color-mix(in_srgb,var(--wedding-navy)_32%,transparent)]"
+      aria-live="polite"
+      aria-atomic="true"
+      aria-label="Photo upload progress"
+    >
+      <div className="flex items-start gap-3">
+        <span className="bg-wedding-blue text-wedding-brown grid size-10 shrink-0 place-items-center rounded-full">
+          {phase === "failed" ? (
+            <CircleAlert aria-hidden="true" className="size-5" />
+          ) : (
+            <Upload aria-hidden="true" className="size-5" />
+          )}
+        </span>
+        <div className="min-w-0 flex-1">
+          <p className="m-0 text-sm font-extrabold">{label}</p>
+          <p className="text-wedding-navy/68 mt-1 mb-0 text-xs leading-relaxed">
+            {detail}
+          </p>
+        </div>
+        <button
+          type="button"
+          className="focus-ring grid size-9 shrink-0 place-items-center"
+          aria-label="Minimize upload progress"
+          onClick={onMinimize}
+        >
+          <Minimize2 aria-hidden="true" className="size-4" />
+        </button>
+      </div>
+      <div
+        className="bg-wedding-navy/12 mt-4 h-2 overflow-hidden"
+        role="progressbar"
+        aria-label="Photo upload progress"
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-valuenow={progress}
+      >
+        <div
+          className="bg-wedding-blue h-full transition-[width] duration-200 motion-reduce:transition-none"
+          style={{ width: `${progress}%` }}
+        />
+      </div>
+    </section>
+  );
+}
+
 function PhotoUploadSuccess({
   open,
   onDismiss,
@@ -184,10 +293,10 @@ function PhotoUploadSuccess({
           <button
             type="button"
             aria-label="Close photo upload success dialog"
-            className="focus-ring bg-wedding-cream text-wedding-navy absolute -top-4 -right-4 grid size-10 place-items-center rounded-full shadow-[0_0.6rem_1.5rem_color-mix(in_srgb,var(--wedding-navy)_24%,transparent)]"
+            className="focus-ring text-wedding-cream absolute -top-14 right-0 grid size-10 place-items-center rounded-full transition-opacity hover:opacity-75"
             onClick={onDismiss}
           >
-            <X className="size-5" aria-hidden="true" />
+            <CircleX className="size-8" strokeWidth={2.5} aria-hidden="true" />
           </button>
           <div className="bg-wedding-cream text-wedding-navy rounded-2xl px-6 py-10 shadow-[0_1.2rem_3rem_color-mix(in_srgb,var(--wedding-navy)_28%,transparent)]">
             <SuccessCopy
@@ -243,6 +352,9 @@ export function PhotoUploadDemo() {
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [uploadPhase, setUploadPhase] = useState<UploadPhase>("idle");
+  const [activeUploadIds, setActiveUploadIds] = useState<string[]>([]);
+  const [trackerMinimized, setTrackerMinimized] = useState(false);
   const previewsRef = useRef(previews);
   useEffect(() => void (previewsRef.current = previews), [previews]);
   useEffect(
@@ -313,6 +425,9 @@ export function PhotoUploadDemo() {
     setError("");
     setBusy(false);
     setSuccess(false);
+    setUploadPhase("idle");
+    setActiveUploadIds([]);
+    setTrackerMinimized(false);
     batchIdRef.current = crypto.randomUUID();
   }
 
@@ -321,6 +436,9 @@ export function PhotoUploadDemo() {
     if (!pending.length) return;
     setBusy(true);
     setError("");
+    setUploadPhase("preparing");
+    setActiveUploadIds(pending.map(({ id }) => id));
+    setTrackerMinimized(false);
     try {
       const response = await fetch("/api/photos/reservations", {
         method: "POST",
@@ -343,6 +461,7 @@ export function PhotoUploadDemo() {
         throw new Error(result.error ?? "We couldn't prepare your photos.");
       const uploaded: Preview[] = [];
       let authorizationMissing = false;
+      setUploadPhase("uploading");
       await runWithConcurrency(
         pending,
         guestPhotoUploadConcurrency,
@@ -370,10 +489,12 @@ export function PhotoUploadDemo() {
       );
       if (!uploaded.length) {
         setError("Some photos could not be sent. Retry the failed photos.");
+        setUploadPhase("failed");
         return;
       }
       let completionResults: Array<{ id: string; ok: boolean }> = [];
       try {
+        setUploadPhase("finalizing");
         const completion = await fetch("/api/photos/complete", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -392,6 +513,7 @@ export function PhotoUploadDemo() {
           update(id, { state: "failed", progress: 100 }),
         );
         setError("Some photos could not be sent. Retry the failed photos.");
+        setUploadPhase("failed");
         return;
       }
       let completionFailed = authorizationMissing;
@@ -406,20 +528,57 @@ export function PhotoUploadDemo() {
       });
       if (completionFailed)
         setError("Some photos could not be sent. Retry the failed photos.");
-      else setSuccess(true);
+      if (completionFailed) {
+        setUploadPhase("failed");
+      } else {
+        setUploadPhase("idle");
+        setActiveUploadIds([]);
+        setSuccess(true);
+      }
     } catch (uploadError) {
       setError(
         uploadError instanceof Error
           ? uploadError.message
           : "We couldn't upload those photos.",
       );
+      setUploadPhase("failed");
     } finally {
       setBusy(false);
     }
   }
 
+  const activeUploads = previews.filter(({ id }) =>
+    activeUploadIds.includes(id),
+  );
+  const activeUploadBytes = activeUploads.reduce(
+    (total, preview) => total + preview.file.size,
+    0,
+  );
+  const uploadedBytes = activeUploads.reduce(
+    (total, preview) => total + (preview.file.size * preview.progress) / 100,
+    0,
+  );
+  const uploadProgress = activeUploadBytes
+    ? Math.min(100, Math.round((uploadedBytes / activeUploadBytes) * 100))
+    : 0;
+  const completedUploads = activeUploads.filter(
+    ({ state }) => state === "complete",
+  ).length;
+
   return (
     <div className="min-w-0">
+      {uploadPhase !== "idle" ? (
+        <UploadProgressTracker
+          phase={uploadPhase}
+          progress={uploadProgress}
+          total={activeUploads.length}
+          completed={completedUploads}
+          error={error}
+          minimized={trackerMinimized}
+          onMinimize={() => setTrackerMinimized(true)}
+          onExpand={() => setTrackerMinimized(false)}
+        />
+      ) : null}
       <div
         className="border-wedding-cream/52 hover:border-wedding-blue flex min-h-[22rem] flex-col items-center justify-center border px-5 py-10 text-center"
         onDragOver={(event) => event.preventDefault()}

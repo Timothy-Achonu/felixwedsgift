@@ -27,6 +27,23 @@ class SuccessfulUploadRequest {
   }
 }
 
+class PendingUploadRequest {
+  status = 0;
+  upload = { onprogress: null as ((event: ProgressEvent) => void) | null };
+  onerror: (() => void) | null = null;
+  onload: (() => void) | null = null;
+
+  open() {}
+
+  send() {
+    this.upload.onprogress?.({
+      lengthComputable: true,
+      loaded: 1,
+      total: 2,
+    } as ProgressEvent);
+  }
+}
+
 describe("guest photo upload", () => {
   beforeEach(() => {
     uploadUrl = "";
@@ -157,6 +174,58 @@ describe("guest photo upload", () => {
     ).not.toBeInTheDocument();
   });
 
+  it("minimizes and restores live upload progress", async () => {
+    vi.stubGlobal("XMLHttpRequest", PendingUploadRequest);
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValueOnce(
+        Response.json({
+          uploads: [
+            {
+              id: "00000000-0000-4000-8000-000000000001",
+              cloudName: "wedding-cloud",
+              apiKey: "key",
+              overwrite: false,
+              public_id: "wedding/guest/photo",
+              timestamp: 1,
+              signature: "signature",
+              type: "authenticated",
+            },
+          ],
+        }),
+      ),
+    );
+    vi.spyOn(crypto, "randomUUID")
+      .mockReturnValueOnce("00000000-0000-4000-8000-000000000002")
+      .mockReturnValueOnce("00000000-0000-4000-8000-000000000001");
+    render(<PhotoUploadDemo />);
+
+    fireEvent.change(screen.getByLabelText("Choose photos"), {
+      target: {
+        files: [new File(["photo"], "moment.jpg", { type: "image/jpeg" })],
+      },
+    });
+    fireEvent.click(
+      await screen.findByRole("button", { name: "Share photos for review" }),
+    );
+
+    expect(await screen.findByRole("progressbar")).toHaveAttribute(
+      "aria-valuenow",
+      "50",
+    );
+    fireEvent.click(
+      screen.getByRole("button", { name: "Minimize upload progress" }),
+    );
+    expect(
+      screen.getByRole("button", { name: /Expand upload progress/ }),
+    ).toBeInTheDocument();
+
+    fireEvent.click(
+      screen.getByRole("button", { name: /Expand upload progress/ }),
+    );
+    expect(screen.getByRole("progressbar")).toBeInTheDocument();
+  });
+
   it("shows a centered dialog on desktop after a successful upload", async () => {
     vi.spyOn(window, "matchMedia").mockImplementation((query: string) => ({
       matches: query.includes("min-width: 640px"),
@@ -222,11 +291,13 @@ describe("guest photo upload", () => {
       screen.getByRole("button", { name: "Share more photos" }),
     ).toBeInTheDocument();
 
-    fireEvent.click(
-      screen.getByRole("button", {
-        name: "Close photo upload success dialog",
-      }),
-    );
+    const closeButton = screen.getByRole("button", {
+      name: "Close photo upload success dialog",
+    });
+    expect(closeButton).toHaveClass("-top-14", "text-wedding-cream");
+    expect(closeButton).not.toHaveClass("bg-wedding-cream");
+
+    fireEvent.click(closeButton);
     await waitFor(() =>
       expect(screen.queryByRole("dialog")).not.toBeInTheDocument(),
     );
