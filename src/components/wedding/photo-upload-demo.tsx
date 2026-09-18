@@ -293,7 +293,7 @@ function PhotoUploadSuccess({
           <button
             type="button"
             aria-label="Close photo upload success dialog"
-            className="focus-ring text-wedding-cream absolute -top-14 right-0 grid size-10 place-items-center rounded-full transition-opacity hover:opacity-75"
+            className="focus-ring text-wedding-cream absolute -top-14 -right-14 grid size-10 place-items-center rounded-full transition-opacity hover:opacity-75"
             onClick={onDismiss}
           >
             <CircleX className="size-8" strokeWidth={2.5} aria-hidden="true" />

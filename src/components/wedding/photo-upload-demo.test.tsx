@@ -294,7 +294,11 @@ describe("guest photo upload", () => {
     const closeButton = screen.getByRole("button", {
       name: "Close photo upload success dialog",
     });
-    expect(closeButton).toHaveClass("-top-14", "text-wedding-cream");
+    expect(closeButton).toHaveClass(
+      "-top-14",
+      "-right-14",
+      "text-wedding-cream",
+    );
     expect(closeButton).not.toHaveClass("bg-wedding-cream");
 
     fireEvent.click(closeButton);
