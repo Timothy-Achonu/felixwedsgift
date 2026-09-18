@@ -15,7 +15,7 @@ function Toaster({ className, ...props }: ToasterProps) {
       toastOptions={{
         classNames: {
           toast:
-            "flex items-start gap-3 rounded-none border border-wedding-navy/16 bg-wedding-cream px-5 py-4 text-wedding-navy shadow-[0.7rem_0.7rem_0_color-mix(in_srgb,var(--wedding-brown)_12%,transparent)] min-w-[min(24rem,calc(100vw-2rem))]",
+            "flex items-center gap-3 rounded-none border border-wedding-navy/16 bg-wedding-cream px-5 py-4 text-wedding-navy shadow-[0.7rem_0.7rem_0_color-mix(in_srgb,var(--wedding-brown)_12%,transparent)] min-w-[min(24rem,calc(100vw-2rem))] [&_[data-icon]]:!m-0 [&_[data-icon]]:!size-10 [&_[data-icon]]:!justify-center",
           title: "font-display text-lg leading-tight font-medium",
           description: "text-sm leading-relaxed text-wedding-navy/70",
           icon: "mt-0.5",
