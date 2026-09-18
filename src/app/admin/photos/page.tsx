@@ -58,7 +58,11 @@ export default async function PhotosPage({
             The guest-photo migration is unavailable.
           </p>
         ) : (
-          <PhotoModeration initialPhotos={data ?? []} />
+          <PhotoModeration
+            key={status}
+            status={status}
+            initialPhotos={data ?? []}
+          />
         )}
       </section>
     </AdminShell>

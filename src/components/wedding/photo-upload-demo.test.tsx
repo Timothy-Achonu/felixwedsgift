@@ -134,14 +134,83 @@ describe("guest photo upload", () => {
       await screen.findByRole("button", { name: "Share photos for review" }),
     );
 
-    expect(await screen.findByRole("status")).toHaveTextContent(
+    expect(await screen.findByRole("dialog")).toHaveTextContent(
       "Photos received",
     );
+    expect(screen.getByRole("dialog").tagName).not.toBe("DIALOG");
     expect(screen.getByText(/waiting for review/i)).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Share more photos" }),
+    ).toBeInTheDocument();
     expect(uploadUrl).toBe(
       "https://api.cloudinary.com/v1_1/wedding-cloud/image/upload",
     );
     expect(uploadBody?.get("type")).toBe("authenticated");
+  });
+
+  it("shows a centered dialog on desktop after a successful upload", async () => {
+    vi.spyOn(window, "matchMedia").mockImplementation((query: string) => ({
+      matches: query.includes("min-width: 640px"),
+      media: query,
+      onchange: null,
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+    }));
+    vi.stubGlobal("XMLHttpRequest", SuccessfulUploadRequest);
+    vi.stubGlobal(
+      "fetch",
+      vi
+        .fn()
+        .mockResolvedValueOnce(
+          new Response(
+            JSON.stringify({
+              uploads: [
+                {
+                  id: "00000000-0000-4000-8000-000000000001",
+                  cloudName: "wedding-cloud",
+                  apiKey: "key",
+                  overwrite: false,
+                  public_id: "wedding/guest/photo",
+                  timestamp: 1,
+                  signature: "signature",
+                  type: "authenticated",
+                },
+              ],
+            }),
+          ),
+        )
+        .mockResolvedValueOnce(
+          new Response(
+            JSON.stringify({
+              results: [
+                { id: "00000000-0000-4000-8000-000000000001", ok: true },
+              ],
+            }),
+          ),
+        ),
+    );
+    vi.spyOn(crypto, "randomUUID")
+      .mockReturnValueOnce("00000000-0000-4000-8000-000000000002")
+      .mockReturnValueOnce("00000000-0000-4000-8000-000000000001");
+    render(<PhotoUploadDemo />);
+    fireEvent.change(screen.getByLabelText("Choose photos"), {
+      target: {
+        files: [new File(["photo"], "moment.jpg", { type: "image/jpeg" })],
+      },
+    });
+    fireEvent.click(
+      await screen.findByRole("button", { name: "Share photos for review" }),
+    );
+
+    const dialog = await screen.findByRole("dialog");
+    expect(dialog.tagName).toBe("DIALOG");
+    expect(dialog).toHaveTextContent("Photos received");
+    expect(
+      screen.getByRole("button", { name: "Share more photos" }),
+    ).toBeInTheDocument();
   });
 
   it("keeps a failed finalization available for retry", async () => {
@@ -200,6 +269,6 @@ describe("guest photo upload", () => {
     expect(
       screen.getByRole("button", { name: "Retry failed photos" }),
     ).toBeInTheDocument();
-    expect(screen.queryByText("Photos received")).not.toBeInTheDocument();
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   });
 });

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 
+import { Button } from "@/components/ui/button";
 import type { PageImageRow, PageImageSlot } from "@/data/page-images";
 import {
   maximumPageImageBytes,
@@ -349,14 +350,15 @@ function PhotoCard({
               {confirmation}
             </p>
           ) : null}
-          <button
+          <Button
             type="button"
-            className={adminStyles.primaryButton}
+            variant="navy"
             disabled={busy}
+            isLoading={busy}
             onClick={save}
           >
             {busy ? "Saving image..." : `Save ${labels[slot].title}`}
-          </button>
+          </Button>
         </div>
       </div>
     </article>

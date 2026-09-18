@@ -2,6 +2,8 @@
 
 import { useActionState } from "react";
 
+import { Button } from "@/components/ui/button";
+
 import {
   saveWeddingSettings,
   type WeddingSettingsActionState,
@@ -207,13 +209,14 @@ export function WeddingSettingsForm({ settings }: Props) {
         {state.error ? (
           <p className={adminStyles.formError}>{state.error}</p>
         ) : null}
-        <button
-          className={adminStyles.primaryButton}
+        <Button
+          variant="navy"
           type="submit"
+          isLoading={isPending}
           disabled={isPending}
         >
           {isPending ? "Saving…" : "Save wedding details"}
-        </button>
+        </Button>
       </div>
     </form>
   );

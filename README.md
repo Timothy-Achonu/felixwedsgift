@@ -72,9 +72,9 @@ No browser localStorage entries or unsigned upload preset are required. The curr
 
 ## Guest Photographs
 
-Apply `supabase/migrations/20260916000100_create_guest_photos.sql` after the page-image migration. Guest uploads accept batches of up to ten JPEG, PNG, or WebP files, each no larger than 10 MB or 8192 pixels on either side. The browser uploads directly with short-lived signed Cloudinary parameters; the server verifies provider metadata before recording each photo as `PENDING`.
+Apply `supabase/migrations/20260916000100_create_guest_photos.sql` after the page-image migration, then `supabase/migrations/20260918000100_raise_guest_photo_batch_limits.sql`. Guest uploads accept batches of up to 50 JPEG, PNG, or WebP files, each no larger than 10 MB or 8192 pixels on either side. The browser uploads directly with short-lived signed Cloudinary parameters; the server verifies provider metadata before recording each photo as `PENDING`.
 
-Set `UPLOAD_RATE_LIMIT_SECRET` to a random value of at least 32 characters. It hashes the anonymous device cookie and deployment-provided IP address used for the 30-per-device and 200-per-IP hourly limits. `SUPABASE_SECRET_KEY` is also required for reservation and completion routes. The feature fails closed when either value is absent.
+Set `UPLOAD_RATE_LIMIT_SECRET` to a random value of at least 32 characters. It hashes the anonymous device cookie and deployment-provided IP address used for the 100-per-device and 2000-per-IP hourly limits. `SUPABASE_SECRET_KEY` is also required for reservation and completion routes. The feature fails closed when either value is absent.
 
 Administrators review photos at `/admin/photos`, can edit captions, approve or reject individually or in bulk, download originals, and permanently delete individual photos. Only `APPROVED` rows pass public RLS and appear in the paginated gallery. Pending and rejected Cloudinary assets use authenticated delivery; approval intentionally makes the exact original public so only one source asset is stored.
 

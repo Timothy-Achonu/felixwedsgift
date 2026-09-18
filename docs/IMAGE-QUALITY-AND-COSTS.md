@@ -53,7 +53,7 @@ than 5,000 total site visits in the busiest 30 days. Exact originals remain unti
 an administrator explicitly removes them; the application does not automatically
 delete completed memories.
 
-- Allow ten files per batch, each at most 10 MB, in JPEG, PNG, or WebP. Apply type,
+- Allow fifty files per batch, each at most 10 MB, in JPEG, PNG, or WebP. Apply type,
   byte, and dimension checks before uploading and verify provider metadata before
   publishing. Enforce upload authorization, provider restrictions, and server-side
   rate/volume limits; a browser file-size check alone is not abuse protection.

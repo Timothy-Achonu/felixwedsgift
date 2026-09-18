@@ -4,6 +4,7 @@ import { Eye, EyeOff } from "lucide-react";
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 
+import { Button } from "@/components/ui/button";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 
 import { adminStyles } from "../admin-styles";
@@ -86,13 +87,14 @@ export function AdminLoginForm() {
       <p aria-live="polite" className={adminStyles.formError}>
         {error}
       </p>
-      <button
-        className={adminStyles.primaryButton}
+      <Button
+        variant="navy"
         disabled={isSubmitting}
+        isLoading={isSubmitting}
         type="submit"
       >
         {isSubmitting ? "Signing in…" : "Sign in"}
-      </button>
+      </Button>
     </form>
   );
 }

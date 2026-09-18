@@ -2,15 +2,24 @@
 
 import { Check, ImagePlus, RotateCcw, ShieldCheck, Trash2 } from "lucide-react";
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 
+import { Button } from "@/components/ui/button";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerDescription,
+  DrawerTitle,
+} from "@/components/ui/drawer";
 import {
   guestPhotoMimeTypes,
+  guestPhotoUploadConcurrency,
   maximumGuestPhotoBatch,
   maximumGuestPhotoBytes,
   maximumGuestPhotoDimension,
   maximumPhotoCaptionLength,
 } from "@/lib/photos/constants";
+import { runWithConcurrency } from "@/lib/photos/run-with-concurrency";
 
 type Preview = {
   id: string;
@@ -74,6 +83,132 @@ function uploadFile(
   });
 }
 
+const desktopSuccessQuery = "(min-width: 640px)";
+
+function useSuccessPresentation(open: boolean) {
+  const [isDesktop, setIsDesktop] = useState(false);
+  const locked = useRef<"modal" | "bottom-sheet" | null>(null);
+
+  useEffect(() => {
+    const media = window.matchMedia(desktopSuccessQuery);
+    const sync = () => setIsDesktop(media.matches);
+    sync();
+    media.addEventListener("change", sync);
+    return () => media.removeEventListener("change", sync);
+  }, []);
+
+  const live = isDesktop ? "modal" : "bottom-sheet";
+  if (open) locked.current ??= live;
+  else locked.current = null;
+  return locked.current ?? live;
+}
+
+function SuccessCopy({
+  showHandle,
+  title,
+  description,
+  onShareMore,
+}: {
+  showHandle: boolean;
+  title: ReactNode;
+  description: ReactNode;
+  onShareMore: () => void;
+}) {
+  return (
+    <div className="flex flex-col items-center px-2 pt-2 pb-2 text-center">
+      {showHandle ? (
+        <div
+          className="bg-wedding-navy/20 mb-6 h-1.5 w-12 rounded-full"
+          aria-hidden="true"
+        />
+      ) : null}
+      <span className="bg-wedding-blue text-wedding-brown mb-6 grid size-18 place-items-center rounded-full">
+        <Check aria-hidden="true" />
+      </span>
+      <p className="eyebrow text-wedding-brown">Photos received</p>
+      {title}
+      {description}
+      <Button type="button" variant="navy" onClick={onShareMore}>
+        <RotateCcw className="size-4" aria-hidden="true" />
+        Share more photos
+      </Button>
+    </div>
+  );
+}
+
+function PhotoUploadSuccess({
+  open,
+  onShareMore,
+}: {
+  open: boolean;
+  onShareMore: () => void;
+}) {
+  const presentation = useSuccessPresentation(open);
+  const dialogRef = useRef<HTMLDialogElement>(null);
+
+  useEffect(() => {
+    const dialog = dialogRef.current;
+    if (!dialog || presentation !== "modal" || !open) return;
+    if (!dialog.open) dialog.showModal();
+  }, [open, presentation]);
+
+  const description = (
+    <p className="text-wedding-navy/72 mb-7 max-w-[28rem] leading-[1.7]">
+      Your photos are waiting for review before they appear in the album.
+    </p>
+  );
+
+  if (presentation === "modal") {
+    if (!open) return null;
+    return (
+      <dialog
+        ref={dialogRef}
+        aria-labelledby="photo-upload-success-title"
+        className="backdrop:bg-wedding-navy/70 m-0 max-h-none w-auto max-w-none border-0 bg-transparent p-0 open:fixed open:inset-0 open:flex open:items-center open:justify-center"
+        onCancel={(event) => event.preventDefault()}
+      >
+        <div className="bg-wedding-cream text-wedding-navy w-[min(calc(100vw-2rem),28rem)] rounded-2xl px-6 py-10 shadow-[0_1.2rem_3rem_color-mix(in_srgb,var(--wedding-navy)_28%,transparent)]">
+          <SuccessCopy
+            showHandle={false}
+            title={
+              <h3
+                id="photo-upload-success-title"
+                className="wedding-display mt-3 mb-4 max-w-[12ch] text-[2.5rem] leading-none font-medium"
+              >
+                Thank you for sharing the joy.
+              </h3>
+            }
+            description={description}
+            onShareMore={onShareMore}
+          />
+        </div>
+      </dialog>
+    );
+  }
+
+  return (
+    <Drawer open={open} dismissible={false}>
+      <DrawerContent>
+        <SuccessCopy
+          showHandle
+          title={
+            <DrawerTitle className="mt-3 mb-4 max-w-[12ch]">
+              Thank you for sharing the joy.
+            </DrawerTitle>
+          }
+          description={
+            <DrawerDescription className="mb-7 max-w-[28rem]">
+              Your photos are waiting for review before they appear in the
+              album.
+            </DrawerDescription>
+          }
+          onShareMore={onShareMore}
+        />
+      </DrawerContent>
+    </Drawer>
+  );
+}
+
 export function PhotoUploadDemo() {
   const batchIdRef = useRef(crypto.randomUUID());
   const [previews, setPreviews] = useState<Preview[]>([]);
@@ -97,7 +232,8 @@ export function PhotoUploadDemo() {
   async function addFiles(list: FileList | File[]) {
     setError("");
     const slots = maximumGuestPhotoBatch - previews.length;
-    if (slots < 1) return setError("You already selected 10 photos.");
+    if (slots < 1)
+      return setError(`You already selected ${maximumGuestPhotoBatch} photos.`);
     const additions: Preview[] = [];
     const messages: string[] = [];
     for (const file of Array.from(list).slice(0, slots)) {
@@ -179,28 +315,31 @@ export function PhotoUploadDemo() {
         throw new Error(result.error ?? "We couldn't prepare your photos.");
       const uploaded: Preview[] = [];
       let authorizationMissing = false;
-      for (const preview of pending) {
-        const authorization = result.uploads.find(
-          ({ id }) => id === preview.id,
-        );
-        if (!authorization) {
-          authorizationMissing = true;
-          update(preview.id, { state: "failed" });
-          continue;
-        }
-        update(preview.id, { state: "uploading", progress: 0 });
-        try {
-          await uploadFile(preview, authorization, (progress) =>
-            update(preview.id, { progress }),
+      await runWithConcurrency(
+        pending,
+        guestPhotoUploadConcurrency,
+        async (preview) => {
+          const authorization = result.uploads?.find(
+            ({ id }) => id === preview.id,
           );
-        } catch {
-          // A lost response does not prove Cloudinary rejected the bytes. Let
-          // the completion endpoint verify the asset and clean it up if absent.
-          update(preview.id, { state: "uploading" });
-        } finally {
+          if (!authorization) {
+            authorizationMissing = true;
+            update(preview.id, { state: "failed" });
+            return;
+          }
+          update(preview.id, { state: "uploading", progress: 0 });
+          try {
+            await uploadFile(preview, authorization, (progress) =>
+              update(preview.id, { progress }),
+            );
+          } catch {
+            // A lost response does not prove Cloudinary rejected the bytes. Let
+            // the completion endpoint verify the asset and clean it up if absent.
+            update(preview.id, { state: "uploading" });
+          }
           uploaded.push(preview);
-        }
-      }
+        },
+      );
       if (!uploaded.length) {
         setError("Some photos could not be sent. Retry the failed photos.");
         return;
@@ -251,33 +390,6 @@ export function PhotoUploadDemo() {
     }
   }
 
-  if (success)
-    return (
-      <div
-        className="border-wedding-cream/50 flex min-h-[34rem] flex-col items-center justify-center border px-6 py-10 text-center"
-        role="status"
-      >
-        <span className="bg-wedding-blue text-wedding-brown mb-6 grid size-18 place-items-center rounded-full">
-          <Check aria-hidden="true" />
-        </span>
-        <p className="eyebrow">Photos received</p>
-        <h3 className="wedding-display mt-3 mb-4 max-w-[12ch] text-[2.5rem] leading-none font-medium">
-          Thank you for sharing the joy.
-        </h3>
-        <p className="text-wedding-cream/72 mb-7 max-w-[28rem] leading-[1.7]">
-          Your photos are waiting for review before they appear in the album.
-        </p>
-        <button
-          type="button"
-          className="button button-cream focus-ring"
-          onClick={reset}
-        >
-          <RotateCcw className="size-4" aria-hidden="true" />
-          Share more photos
-        </button>
-      </div>
-    );
-
   return (
     <div className="min-w-0">
       <div
@@ -297,7 +409,8 @@ export function PhotoUploadDemo() {
           Bring your view of the day
         </h3>
         <p className="text-wedding-cream/70 mb-7 text-[0.83rem]">
-          Choose up to 10 JPEG, PNG, or WebP photos, 10 MB each.
+          Choose up to {maximumGuestPhotoBatch} JPEG, PNG, or WebP photos, 10 MB
+          each.
         </p>
         <label className="button button-cream focus-within:ring-wedding-blue focus-within:ring-2">
           <ImagePlus className="size-4" aria-hidden="true" />
@@ -334,7 +447,9 @@ export function PhotoUploadDemo() {
           <div className="flex justify-between">
             <p className="m-0 text-[0.8rem] font-bold uppercase">
               Your selection{" "}
-              <span className="text-wedding-blue">{previews.length}/10</span>
+              <span className="text-wedding-blue">
+                {previews.length}/{maximumGuestPhotoBatch}
+              </span>
             </p>
             <button
               className="text-link focus-ring"
@@ -345,9 +460,12 @@ export function PhotoUploadDemo() {
               Clear all
             </button>
           </div>
-          <div className="mt-4 grid gap-4 sm:grid-cols-2">
+          <div className="mt-3 grid gap-2 sm:grid-cols-2">
             {previews.map((preview) => (
-              <article className="border-wedding-cream/30 p-3" key={preview.id}>
+              <article
+                className="border-wedding-cream/40 border p-2"
+                key={preview.id}
+              >
                 <div className="relative aspect-4/3 overflow-hidden">
                   <Image
                     src={preview.url}
@@ -371,16 +489,17 @@ export function PhotoUploadDemo() {
                     <Trash2 className="size-4" aria-hidden="true" />
                   </button>
                 </div>
-                <label className="mt-3 grid gap-2 text-xs font-bold uppercase">
+                <label className="mt-2 grid gap-1 text-[0.68rem] font-bold tracking-[0.06em] uppercase">
                   Caption{" "}
-                  <span className="text-wedding-cream/60 font-medium lowercase">
+                  <span className="text-wedding-cream/70 font-medium normal-case">
                     optional
                   </span>
                   <textarea
-                    className="border-wedding-cream/45 bg-transparent p-2 text-sm font-normal normal-case"
-                    rows={2}
+                    className="border-wedding-cream bg-wedding-cream/10 placeholder:text-wedding-cream/55 border p-2 text-sm font-normal tracking-normal normal-case"
+                    rows={1}
                     maxLength={maximumPhotoCaptionLength}
                     value={preview.caption}
+                    placeholder="Add a caption (optional)"
                     disabled={busy || preview.state === "complete"}
                     onChange={(event) =>
                       update(preview.id, { caption: event.target.value })
@@ -388,7 +507,7 @@ export function PhotoUploadDemo() {
                   />
                 </label>
                 {preview.state !== "ready" ? (
-                  <p className="mt-2 mb-0 text-xs" aria-live="polite">
+                  <p className="mt-1.5 mb-0 text-xs" aria-live="polite">
                     {preview.state === "complete"
                       ? "Ready for review"
                       : preview.state === "failed"
@@ -399,20 +518,23 @@ export function PhotoUploadDemo() {
               </article>
             ))}
           </div>
-          <button
+          <Button
             type="button"
-            className="button button-blue focus-ring mt-6 w-full"
+            variant="blue"
+            className="mt-6 w-full"
+            isLoading={busy}
             disabled={busy}
             onClick={() => void startUpload()}
           >
             {busy
-              ? "Sharing photos..."
+              ? "Uploading..."
               : previews.some(({ state }) => state === "failed")
                 ? "Retry failed photos"
                 : "Share photos for review"}
-          </button>
+          </Button>
         </div>
       ) : null}
+      <PhotoUploadSuccess open={success} onShareMore={reset} />
     </div>
   );
 }

@@ -72,7 +72,7 @@ export async function POST(request: Request) {
     input.files.length > maximumGuestPhotoBatch
   ) {
     return Response.json(
-      { error: "Choose between 1 and 10 photos." },
+      { error: `Choose between 1 and ${maximumGuestPhotoBatch} photos.` },
       { status: 400 },
     );
   }

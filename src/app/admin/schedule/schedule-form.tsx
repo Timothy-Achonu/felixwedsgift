@@ -2,6 +2,8 @@
 
 import { useActionState } from "react";
 
+import { Button } from "@/components/ui/button";
+
 import { saveScheduleItem } from "../actions";
 import { adminStyles } from "../admin-styles";
 import { AdminTimeSelect } from "../fields/date-time-picker";
@@ -58,13 +60,14 @@ export function ScheduleItemForm({
         ) : (
           <span />
         )}
-        <button
-          className={adminStyles.primaryButton}
+        <Button
+          variant="navy"
           type="submit"
+          isLoading={isPending}
           disabled={isPending}
         >
           {isPending ? "Saving…" : item ? "Save entry" : "Add entry"}
-        </button>
+        </Button>
       </div>
     </form>
   );

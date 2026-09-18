@@ -2,6 +2,7 @@ import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
 
+import { Toaster } from "@/components/ui/sonner";
 import { requireAdmin } from "@/lib/auth/admin";
 
 import { logout } from "./actions";
@@ -93,6 +94,7 @@ export async function AdminShell({
         </aside>
         {children}
       </div>
+      <Toaster />
     </main>
   );
 }

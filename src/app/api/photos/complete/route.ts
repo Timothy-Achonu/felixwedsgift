@@ -4,7 +4,10 @@ import { cookies } from "next/headers";
 
 import { env } from "@/env";
 import { destroyGuestPhoto, verifyGuestPhoto } from "@/lib/photos/cloudinary";
-import { maximumPhotoCaptionLength } from "@/lib/photos/constants";
+import {
+  maximumGuestPhotoBatch,
+  maximumPhotoCaptionLength,
+} from "@/lib/photos/constants";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 
 type Completion = { id?: unknown; caption?: unknown };
@@ -39,7 +42,7 @@ export async function POST(request: Request) {
   if (
     !Array.isArray(input.photos) ||
     input.photos.length < 1 ||
-    input.photos.length > 10
+    input.photos.length > maximumGuestPhotoBatch
   ) {
     return Response.json(
       { error: "Invalid completion request." },
