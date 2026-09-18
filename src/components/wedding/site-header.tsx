@@ -1,6 +1,6 @@
 "use client";
 
-import { Camera, Heart, Menu, X } from "lucide-react";
+import { Camera, Heart, Menu, Settings2, X } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 
@@ -11,7 +11,11 @@ const links = [
   { href: "/gallery", label: "Gallery" },
 ];
 
-export function SiteHeader() {
+export function SiteHeader({
+  showAdminShortcut = false,
+}: {
+  showAdminShortcut?: boolean;
+}) {
   const [menuOpen, setMenuOpen] = useState(false);
 
   const closeMenu = () => setMenuOpen(false);
@@ -19,14 +23,25 @@ export function SiteHeader() {
   return (
     <header className="text-wedding-cream absolute inset-x-0 top-0 z-40">
       <div className="mx-auto flex h-20 w-full max-w-[1440px] items-center justify-between px-5 sm:px-8 lg:px-12">
-        <Link
-          href="/"
-          className="focus-ring inline-flex items-center gap-2 text-sm font-semibold uppercase"
-          aria-label="Felix and Gift, home"
-        >
-          <Heart aria-hidden="true" className="size-4 fill-current" />
-          <span>F &amp; G</span>
-        </Link>
+        <div className="flex items-center gap-1">
+          <Link
+            href="/"
+            className="focus-ring inline-flex items-center gap-2 text-sm font-semibold uppercase"
+            aria-label="Felix and Gift, home"
+          >
+            <Heart aria-hidden="true" className="size-4 fill-current" />
+            <span>F &amp; G</span>
+          </Link>
+          {showAdminShortcut ? (
+            <Link
+              href="/admin"
+              className="focus-ring text-wedding-cream/72 hover:text-wedding-blue grid size-9 place-items-center transition-colors"
+              aria-label="Open wedding studio"
+            >
+              <Settings2 aria-hidden="true" className="size-3.5" />
+            </Link>
+          ) : null}
+        </div>
 
         <nav
           aria-label="Primary navigation"

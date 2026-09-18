@@ -16,6 +16,7 @@ import { Reveal } from "@/components/wedding/reveal";
 import { SiteHeader } from "@/components/wedding/site-header";
 import { WeddingGallery } from "@/components/wedding/wedding-gallery";
 import { getWeddingContent } from "@/data/wedding";
+import { getAdminIdentity } from "@/lib/auth/admin";
 import { getPublicWeddingMetadata } from "@/lib/wedding/metadata";
 import { heroImageSizes } from "@/lib/images/page-images";
 
@@ -26,7 +27,10 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function Home() {
-  const wedding = await getWeddingContent();
+  const [wedding, admin] = await Promise.all([
+    getWeddingContent(),
+    getAdminIdentity(),
+  ]);
   const coupleName = `${wedding.couple.partnerOne} & ${wedding.couple.partnerTwo}`;
   const commonHeroProps = {
     alt: wedding.hero.image.alt,
@@ -64,7 +68,7 @@ export default async function Home() {
         className="bg-wedding-navy text-wedding-cream relative max-h-[980px] min-h-[92svh] overflow-hidden"
         aria-labelledby="wedding-heading"
       >
-        <SiteHeader />
+        <SiteHeader showAdminShortcut={admin !== null} />
         <picture>
           <source
             media="(min-width: 768px)"
