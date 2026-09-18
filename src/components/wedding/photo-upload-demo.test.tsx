@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { PhotoUploadDemo } from "@/components/wedding/photo-upload-demo";
@@ -146,6 +146,15 @@ describe("guest photo upload", () => {
       "https://api.cloudinary.com/v1_1/wedding-cloud/image/upload",
     );
     expect(uploadBody?.get("type")).toBe("authenticated");
+
+    fireEvent.keyDown(document, { key: "Escape" });
+
+    await waitFor(() =>
+      expect(screen.queryByRole("dialog")).not.toBeInTheDocument(),
+    );
+    expect(
+      screen.queryByAltText("Preview of moment.jpg"),
+    ).not.toBeInTheDocument();
   });
 
   it("shows a centered dialog on desktop after a successful upload", async () => {
@@ -207,10 +216,23 @@ describe("guest photo upload", () => {
 
     const dialog = await screen.findByRole("dialog");
     expect(dialog.tagName).toBe("DIALOG");
+    expect(dialog).toHaveClass("h-dvh", "open:items-center");
     expect(dialog).toHaveTextContent("Photos received");
     expect(
       screen.getByRole("button", { name: "Share more photos" }),
     ).toBeInTheDocument();
+
+    fireEvent.click(
+      screen.getByRole("button", {
+        name: "Close photo upload success dialog",
+      }),
+    );
+    await waitFor(() =>
+      expect(screen.queryByRole("dialog")).not.toBeInTheDocument(),
+    );
+    expect(
+      screen.queryByAltText("Preview of moment.jpg"),
+    ).not.toBeInTheDocument();
   });
 
   it("keeps a failed finalization available for retry", async () => {

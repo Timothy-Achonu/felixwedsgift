@@ -1,6 +1,13 @@
 "use client";
 
-import { Check, ImagePlus, RotateCcw, ShieldCheck, Trash2 } from "lucide-react";
+import {
+  Check,
+  ImagePlus,
+  RotateCcw,
+  ShieldCheck,
+  Trash2,
+  X,
+} from "lucide-react";
 import Image from "next/image";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 
@@ -138,10 +145,10 @@ function SuccessCopy({
 
 function PhotoUploadSuccess({
   open,
-  onShareMore,
+  onDismiss,
 }: {
   open: boolean;
-  onShareMore: () => void;
+  onDismiss: () => void;
 }) {
   const presentation = useSuccessPresentation(open);
   const dialogRef = useRef<HTMLDialogElement>(null);
@@ -164,30 +171,51 @@ function PhotoUploadSuccess({
       <dialog
         ref={dialogRef}
         aria-labelledby="photo-upload-success-title"
-        className="backdrop:bg-wedding-navy/70 m-0 max-h-none w-auto max-w-none border-0 bg-transparent p-0 open:fixed open:inset-0 open:flex open:items-center open:justify-center"
-        onCancel={(event) => event.preventDefault()}
+        className="backdrop:bg-wedding-navy/70 m-0 box-border h-dvh max-h-none w-screen max-w-none border-0 bg-transparent p-0 open:fixed open:inset-0 open:flex open:items-center open:justify-center"
+        onCancel={(event) => {
+          event.preventDefault();
+          onDismiss();
+        }}
+        onClick={(event) => {
+          if (event.target === event.currentTarget) onDismiss();
+        }}
       >
-        <div className="bg-wedding-cream text-wedding-navy w-[min(calc(100vw-2rem),28rem)] rounded-2xl px-6 py-10 shadow-[0_1.2rem_3rem_color-mix(in_srgb,var(--wedding-navy)_28%,transparent)]">
-          <SuccessCopy
-            showHandle={false}
-            title={
-              <h3
-                id="photo-upload-success-title"
-                className="wedding-display mt-3 mb-4 max-w-[12ch] text-[2.5rem] leading-none font-medium"
-              >
-                Thank you for sharing the joy.
-              </h3>
-            }
-            description={description}
-            onShareMore={onShareMore}
-          />
+        <div className="relative w-[min(calc(100vw-2rem),28rem)]">
+          <button
+            type="button"
+            aria-label="Close photo upload success dialog"
+            className="focus-ring bg-wedding-cream text-wedding-navy absolute -top-4 -right-4 grid size-10 place-items-center rounded-full shadow-[0_0.6rem_1.5rem_color-mix(in_srgb,var(--wedding-navy)_24%,transparent)]"
+            onClick={onDismiss}
+          >
+            <X className="size-5" aria-hidden="true" />
+          </button>
+          <div className="bg-wedding-cream text-wedding-navy rounded-2xl px-6 py-10 shadow-[0_1.2rem_3rem_color-mix(in_srgb,var(--wedding-navy)_28%,transparent)]">
+            <SuccessCopy
+              showHandle={false}
+              title={
+                <h3
+                  id="photo-upload-success-title"
+                  className="wedding-display mt-3 mb-4 max-w-[12ch] text-[2.5rem] leading-none font-medium"
+                >
+                  Thank you for sharing the joy.
+                </h3>
+              }
+              description={description}
+              onShareMore={onDismiss}
+            />
+          </div>
         </div>
       </dialog>
     );
   }
 
   return (
-    <Drawer open={open} dismissible={false}>
+    <Drawer
+      open={open}
+      onOpenChange={(nextOpen) => {
+        if (!nextOpen) onDismiss();
+      }}
+    >
       <DrawerContent>
         <SuccessCopy
           showHandle
@@ -202,7 +230,7 @@ function PhotoUploadSuccess({
               album.
             </DrawerDescription>
           }
-          onShareMore={onShareMore}
+          onShareMore={onDismiss}
         />
       </DrawerContent>
     </Drawer>
@@ -534,7 +562,7 @@ export function PhotoUploadDemo() {
           </Button>
         </div>
       ) : null}
-      <PhotoUploadSuccess open={success} onShareMore={reset} />
+      <PhotoUploadSuccess open={success} onDismiss={reset} />
     </div>
   );
 }
