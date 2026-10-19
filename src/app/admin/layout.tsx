@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 
+import { AdminNavigationTransitionProvider } from "./admin-navigation-transition";
 import { AdminQueryProvider } from "./admin-query-provider";
 
 export const metadata: Metadata = {
@@ -10,5 +11,11 @@ export const metadata: Metadata = {
 export default function AdminLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  return <AdminQueryProvider>{children}</AdminQueryProvider>;
+  return (
+    <AdminQueryProvider>
+      <AdminNavigationTransitionProvider>
+        {children}
+      </AdminNavigationTransitionProvider>
+    </AdminQueryProvider>
+  );
 }

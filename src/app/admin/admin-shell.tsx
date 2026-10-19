@@ -8,6 +8,7 @@ import { requireAdmin } from "@/lib/auth/admin";
 import { logout } from "./actions";
 import { adminStyles } from "./admin-styles";
 import { AdminNavigation } from "./admin-navigation";
+import { AdminSectionContent } from "./admin-section-content";
 
 type ActiveSection =
   "overview" | "details" | "schedule" | "page-images" | "photos";
@@ -55,7 +56,9 @@ export async function AdminShell({
             </Link>
           </div>
         </aside>
-        {children}
+        <AdminSectionContent activeSection={activeSection}>
+          {children}
+        </AdminSectionContent>
       </div>
       <Toaster />
     </main>

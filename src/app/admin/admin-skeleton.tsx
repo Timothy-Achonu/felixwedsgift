@@ -1,4 +1,5 @@
 import { adminStyles } from "./admin-styles";
+import type { AdminSectionId } from "./admin-navigation-transition";
 
 type SkeletonKind = "details" | "schedule" | "page-images" | "photos";
 
@@ -60,6 +61,48 @@ export function AdminSkeleton({ kind }: { kind: SkeletonKind }) {
         </div>
       ))}
     </div>
+  );
+}
+
+export function AdminRouteSkeleton({ kind }: { kind: AdminSectionId }) {
+  const label = kind.replaceAll("-", " ");
+
+  return (
+    <section
+      aria-label={`Loading ${label}`}
+      aria-busy="true"
+      className={adminStyles.content}
+    >
+      <div
+        aria-hidden="true"
+        className={`${adminStyles.contentIntro} animate-pulse motion-reduce:animate-none`}
+      >
+        <div className="bg-wedding-navy/8 h-3 w-32" />
+        <div className="bg-wedding-navy/8 mt-4 h-16 w-4/5 max-w-3xl" />
+        <div className="bg-wedding-navy/8 mt-4 h-4 w-full max-w-[32rem]" />
+      </div>
+
+      {kind === "overview" ? (
+        <div
+          aria-hidden="true"
+          className={`${adminStyles.moduleGrid} animate-pulse motion-reduce:animate-none`}
+        >
+          {Array.from({ length: 3 }, (_, index) => (
+            <div
+              key={index}
+              className={`${adminStyles.moduleCard} grid content-start gap-4`}
+            >
+              <div className="bg-wedding-navy/8 h-3 w-28" />
+              <div className="bg-wedding-navy/8 h-8 w-3/4" />
+              <div className="bg-wedding-navy/8 h-4 w-full" />
+              <div className="bg-wedding-navy/8 h-4 w-2/3" />
+            </div>
+          ))}
+        </div>
+      ) : (
+        <AdminSkeleton kind={kind} />
+      )}
+    </section>
   );
 }
 
