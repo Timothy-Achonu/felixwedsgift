@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 
+import { AdminQueryProvider } from "./admin-query-provider";
+
 export const metadata: Metadata = {
   title: "Admin | Felix & Gift",
   description: "Manage the Felix & Gift wedding website.",
@@ -8,5 +10,5 @@ export const metadata: Metadata = {
 export default function AdminLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  return children;
+  return <AdminQueryProvider>{children}</AdminQueryProvider>;
 }

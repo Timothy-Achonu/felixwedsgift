@@ -7,6 +7,7 @@ import { requireAdmin } from "@/lib/auth/admin";
 
 import { logout } from "./actions";
 import { adminStyles } from "./admin-styles";
+import { AdminNavigation } from "./admin-navigation";
 
 type ActiveSection =
   "overview" | "details" | "schedule" | "page-images" | "photos";
@@ -38,45 +39,7 @@ export async function AdminShell({
           </div>
 
           <p className={adminStyles.eyebrow}>Workspace</p>
-          <nav className={adminStyles.sidebarNav}>
-            <Link
-              className={`${adminStyles.navLink} ${activeSection === "overview" ? adminStyles.navActive : ""}`}
-              href="/admin"
-              aria-current={activeSection === "overview" ? "page" : undefined}
-            >
-              Overview
-            </Link>
-            <Link
-              className={`${adminStyles.navLink} ${activeSection === "photos" ? adminStyles.navActive : ""}`}
-              href="/admin/photos"
-              aria-current={activeSection === "photos" ? "page" : undefined}
-            >
-              Photos
-            </Link>
-            <Link
-              className={`${adminStyles.navLink} ${activeSection === "details" ? adminStyles.navActive : ""}`}
-              href="/admin/details"
-              aria-current={activeSection === "details" ? "page" : undefined}
-            >
-              Wedding details
-            </Link>
-            <Link
-              className={`${adminStyles.navLink} ${activeSection === "page-images" ? adminStyles.navActive : ""}`}
-              href="/admin/page-images"
-              aria-current={
-                activeSection === "page-images" ? "page" : undefined
-              }
-            >
-              Page images
-            </Link>
-            <Link
-              className={`${adminStyles.navLink} ${activeSection === "schedule" ? adminStyles.navActive : ""}`}
-              href="/admin/schedule"
-              aria-current={activeSection === "schedule" ? "page" : undefined}
-            >
-              Schedule
-            </Link>
-          </nav>
+          <AdminNavigation activeSection={activeSection} />
           <div className={adminStyles.sidebarFooter}>
             <div className={adminStyles.headerActions}>
               <span className={adminStyles.user}>{admin.email}</span>

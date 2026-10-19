@@ -1,7 +1,7 @@
 "use client";
 
 import { Download, Trash2 } from "lucide-react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { toastError, toastSuccess } from "@/components/ui/sonner";
@@ -11,14 +11,30 @@ import { applyPhotoModeration } from "@/lib/photos/moderation-list";
 export function PhotoModeration({
   initialPhotos,
   status,
+  onDataChanged,
 }: {
   initialPhotos: AdminPhoto[];
   status: GuestPhotoStatus | "ALL";
+  onDataChanged?: () => void;
 }) {
-  const [photos, setPhotos] = useState(initialPhotos);
+  const [photoOverrides, setPhotoOverrides] = useState<
+    Record<string, AdminPhoto>
+  >({});
+  const [removedIds, setRemovedIds] = useState<Set<string>>(() => new Set());
   const [selected, setSelected] = useState<string[]>([]);
   const [busy, setBusy] = useState(false);
   const [pendingKey, setPendingKey] = useState<string | null>(null);
+  const photos = useMemo(
+    () =>
+      initialPhotos.flatMap((photo) => {
+        if (removedIds.has(photo.id)) return [];
+        const override = photoOverrides[photo.id];
+        return [
+          override && override.revision > photo.revision ? override : photo,
+        ];
+      }),
+    [initialPhotos, photoOverrides, removedIds],
+  );
 
   function commitUpdates(
     updates: Array<{
@@ -28,7 +44,23 @@ export function PhotoModeration({
       caption?: string | null;
     }>,
   ) {
-    setPhotos((current) => applyPhotoModeration(current, status, updates));
+    const nextPhotos = applyPhotoModeration(photos, status, updates);
+    const nextById = new Map(nextPhotos.map((photo) => [photo.id, photo]));
+    setPhotoOverrides((current) => {
+      const next = { ...current };
+      for (const update of updates) {
+        const photo = nextById.get(update.id);
+        if (photo) next[update.id] = photo;
+      }
+      return next;
+    });
+    setRemovedIds((current) => {
+      const next = new Set(current);
+      for (const update of updates) {
+        if (!nextById.has(update.id)) next.add(update.id);
+      }
+      return next;
+    });
     const dropped = new Set(
       updates
         .filter(
@@ -88,6 +120,7 @@ export function PhotoModeration({
       );
     } finally {
       setPendingKey(null);
+      onDataChanged?.();
     }
   }
 
@@ -131,6 +164,7 @@ export function PhotoModeration({
     } finally {
       setBusy(false);
       setPendingKey(null);
+      onDataChanged?.();
     }
   }
 
@@ -150,7 +184,7 @@ export function PhotoModeration({
       );
       const result = (await response.json()) as { error?: string };
       if (!response.ok) throw new Error(result.error ?? "Deletion failed.");
-      setPhotos((current) => current.filter(({ id }) => id !== photo.id));
+      setRemovedIds((current) => new Set(current).add(photo.id));
       setSelected((current) => current.filter((id) => id !== photo.id));
       toastSuccess("Photograph deleted");
     } catch (error) {
@@ -158,6 +192,7 @@ export function PhotoModeration({
     } finally {
       setBusy(false);
       setPendingKey(null);
+      onDataChanged?.();
     }
   }
 

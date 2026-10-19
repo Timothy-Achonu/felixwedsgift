@@ -1,9 +1,9 @@
 import { ArrowDown, ArrowUp, Trash2 } from "lucide-react";
 
 import { deleteScheduleItem, moveScheduleItem } from "../actions";
+import type { AdminScheduleItem } from "../admin-queries";
 import { adminStyles } from "../admin-styles";
 import { ScheduleItemForm } from "./schedule-form";
-import type { AdminScheduleItem } from "./page";
 
 function MoveButton({
   item,

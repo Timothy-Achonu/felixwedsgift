@@ -1,17 +1,12 @@
 import { env } from "@/env";
 import { mockWeddingContent } from "@/data/mock-wedding";
-import {
-  pageImageSlots,
-  type PageImageRow,
-  type PageImageSlot,
-} from "@/data/page-images";
+import type { PageImageSlot } from "@/data/page-images";
 import { requireAdmin } from "@/lib/auth/admin";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
 import type { WeddingPhoto } from "@/types/wedding";
 
 import { AdminShell } from "../admin-shell";
 import { adminStyles } from "../admin-styles";
-import { PageImageEditor } from "./page-image-editor";
+import { PageImagesContent } from "./page-images-content";
 
 const fallbacks: Record<PageImageSlot, WeddingPhoto> = {
   hero_desktop: mockWeddingContent.hero.image,
@@ -23,14 +18,6 @@ const fallbacks: Record<PageImageSlot, WeddingPhoto> = {
 
 export default async function PageImagesPage() {
   await requireAdmin();
-  const supabase = await createSupabaseServerClient();
-  const { data, error } = await supabase
-    .from("page_images")
-    .select(
-      "slot, cloudinary_public_id, secure_url, alt, width, height, focal_x, focal_y",
-    )
-    .returns<PageImageRow[]>();
-  const images = new Map((data ?? []).map((row) => [row.slot, row]));
   const configured = Boolean(
     env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME &&
     env.CLOUDINARY_API_KEY &&
@@ -54,25 +41,7 @@ export default async function PageImagesPage() {
             appear as soon as each image is saved.
           </p>
         </div>
-        {error ? (
-          <p className={`${adminStyles.formError} ${adminStyles.pageError}`}>
-            The page-images table is unavailable. Apply the new Supabase
-            migration before editing.
-          </p>
-        ) : !configured ? (
-          <p className={`${adminStyles.formError} ${adminStyles.pageError}`}>
-            Set the Cloudinary cloud name, API key and API secret before
-            uploading page images.
-          </p>
-        ) : (
-          <PageImageEditor
-            entries={pageImageSlots.map((slot) => ({
-              slot,
-              image: images.get(slot) ?? null,
-              fallback: fallbacks[slot],
-            }))}
-          />
-        )}
+        <PageImagesContent configured={configured} fallbacks={fallbacks} />
       </section>
     </AdminShell>
   );

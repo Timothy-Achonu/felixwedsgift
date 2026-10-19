@@ -107,6 +107,7 @@ function PhotoCard({
   heroDescription,
   desktopHeroSaved,
   onDesktopHeroSaved,
+  onSaved,
 }: {
   entry: Entry;
   desktopSource: File | null;
@@ -114,6 +115,7 @@ function PhotoCard({
   heroDescription: string;
   desktopHeroSaved: boolean;
   onDesktopHeroSaved: (description: string) => void;
+  onSaved?: () => void;
 }) {
   const { slot, fallback } = entry;
   const [saved, setSaved] = useState(entry.image);
@@ -200,6 +202,7 @@ function PhotoCard({
         throw new Error(String(result.error ?? "The image was not saved."));
       }
       setSaved(result.image as PageImageRow);
+      onSaved?.();
       committed = true;
       setSelected(null);
       if (slot === "hero_desktop") {
@@ -365,7 +368,13 @@ function PhotoCard({
   );
 }
 
-export function PageImageEditor({ entries }: { entries: Entry[] }) {
+export function PageImageEditor({
+  entries,
+  onSaved,
+}: {
+  entries: Entry[];
+  onSaved?: () => void;
+}) {
   const [desktopSource, setDesktopSource] = useState<File | null>(null);
   const desktopHero = entries.find((entry) => entry.slot === "hero_desktop");
   const [heroDescription, setHeroDescription] = useState(
@@ -392,6 +401,7 @@ export function PageImageEditor({ entries }: { entries: Entry[] }) {
             setHeroDescription(description);
             setDesktopHeroSaved(true);
           }}
+          onSaved={onSaved}
         />
       ))}
     </div>

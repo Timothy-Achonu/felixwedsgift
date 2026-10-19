@@ -14,6 +14,25 @@ vi.mock("./actions", () => ({
   logout,
 }));
 
+vi.mock("./admin-navigation", () => ({
+  AdminNavigation: ({ activeSection }: { activeSection: string }) => (
+    <nav aria-label="Workspace sections">
+      <a
+        href="/admin"
+        aria-current={activeSection === "overview" ? "page" : undefined}
+      >
+        Overview
+      </a>
+      <a
+        href="/admin/details"
+        aria-current={activeSection === "details" ? "page" : undefined}
+      >
+        Wedding details
+      </a>
+    </nav>
+  ),
+}));
+
 import { AdminShell } from "./admin-shell";
 
 describe("admin shell", () => {

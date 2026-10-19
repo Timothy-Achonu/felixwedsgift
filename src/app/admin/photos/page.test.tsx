@@ -4,45 +4,36 @@ import { describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
   requireAdmin: vi.fn().mockResolvedValue({ id: "admin" }),
-  createSupabaseServerClient: vi.fn(),
 }));
 
 vi.mock("@/lib/auth/admin", () => ({ requireAdmin: mocks.requireAdmin }));
-vi.mock("@/lib/supabase/server", () => ({
-  createSupabaseServerClient: mocks.createSupabaseServerClient,
-}));
 vi.mock("../admin-shell", () => ({
   AdminShell: ({ children }: { children: ReactNode }) => <>{children}</>,
 }));
-vi.mock("./photo-moderation", () => ({
-  PhotoModeration: () => <p>Photo moderation</p>,
+vi.mock("./photo-moderation-content", () => ({
+  PhotoModerationContent: ({ initialStatus }: { initialStatus: string }) => (
+    <p>Photo status: {initialStatus}</p>
+  ),
 }));
 
 import PhotosPage from "./page";
 
-describe("photo moderation filters", () => {
-  it("gives the active filter readable text and current-page semantics", async () => {
-    const query = {
-      select: vi.fn(),
-      order: vi.fn(),
-      limit: vi.fn(),
-      returns: vi.fn(),
-    };
-    query.select.mockReturnValue(query);
-    query.order.mockReturnValue(query);
-    query.limit.mockReturnValue(query);
-    query.returns.mockResolvedValue({ data: [], error: null });
-    mocks.createSupabaseServerClient.mockResolvedValue({
-      from: vi.fn().mockReturnValue(query),
-    });
-
+describe("photo moderation route state", () => {
+  it("normalizes a valid requested status for the client query view", async () => {
     render(
       await PhotosPage({ searchParams: Promise.resolve({ status: "ALL" }) }),
     );
 
-    const activeFilter = screen.getByRole("link", { name: "all" });
-    expect(activeFilter).toHaveAttribute("aria-current", "page");
-    expect(activeFilter).toHaveClass("!text-wedding-cream");
-    expect(activeFilter).toHaveClass("!bg-wedding-navy");
+    expect(screen.getByText("Photo status: ALL")).toBeInTheDocument();
+  });
+
+  it("defaults invalid statuses to pending", async () => {
+    render(
+      await PhotosPage({
+        searchParams: Promise.resolve({ status: "not-a-status" }),
+      }),
+    );
+
+    expect(screen.getByText("Photo status: PENDING")).toBeInTheDocument();
   });
 });
