@@ -1,5 +1,5 @@
 ---
-name: grill-me
+name: grill-me-felixwedsgift
 description: >-
   Critical review and adversarial collaboration for feature requests, architecture ideas, product ideas, implementation plans, and workflows. Use when the user wants an idea interrogated before building, to identify hidden contradictions, risks, missing requirements, scalability issues, UX flaws, security problems, and better alternatives.
 ---
