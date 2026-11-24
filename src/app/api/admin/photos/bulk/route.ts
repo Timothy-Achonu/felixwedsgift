@@ -1,4 +1,5 @@
-import { moderatePhoto } from "@/lib/photos/moderation";
+import { maximumPhotoBulkBatchSize } from "@/lib/photos/constants";
+import { moderatePhoto, removePhoto } from "@/lib/photos/moderation";
 
 export async function POST(request: Request) {
   let input: { action?: unknown; photos?: unknown };
@@ -8,13 +9,15 @@ export async function POST(request: Request) {
     return Response.json({ error: "Invalid bulk request." }, { status: 400 });
   }
   if (
-    (input.action !== "approve" && input.action !== "reject") ||
+    (input.action !== "approve" &&
+      input.action !== "reject" &&
+      input.action !== "delete") ||
     !Array.isArray(input.photos) ||
     input.photos.length < 1 ||
-    input.photos.length > 24
+    input.photos.length > maximumPhotoBulkBatchSize
   )
     return Response.json(
-      { error: "Choose up to 24 photographs." },
+      { error: `Choose up to ${maximumPhotoBulkBatchSize} photographs.` },
       { status: 400 },
     );
   const photos = input.photos as Array<{ id?: unknown; revision?: unknown }>;
@@ -30,16 +33,30 @@ export async function POST(request: Request) {
   const results = [];
   for (const photo of photos) {
     try {
+      const result =
+        input.action === "delete"
+          ? await removePhoto(
+              photo.id as string,
+              photo.revision as number,
+            )
+          : await moderatePhoto(
+              photo.id as string,
+              input.action,
+              photo.revision as number,
+            );
       results.push({
         id: photo.id,
-        ...(await moderatePhoto(
-          photo.id as string,
-          input.action,
-          photo.revision as number,
-        )),
+        ...result,
       });
     } catch {
-      results.push({ id: photo.id, ok: false, error: "Moderation failed." });
+      results.push({
+        id: photo.id,
+        ok: false,
+        error:
+          input.action === "delete"
+            ? "Deletion failed."
+            : "Moderation failed.",
+      });
     }
   }
   return Response.json(

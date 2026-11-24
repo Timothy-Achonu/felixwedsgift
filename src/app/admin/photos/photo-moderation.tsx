@@ -5,7 +5,11 @@ import { useMemo, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { toastError, toastSuccess } from "@/components/ui/sonner";
-import type { AdminPhoto, GuestPhotoStatus } from "@/lib/photos/constants";
+import {
+  maximumPhotoBulkBatchSize,
+  type AdminPhoto,
+  type GuestPhotoStatus,
+} from "@/lib/photos/constants";
 import { applyPhotoModeration } from "@/lib/photos/moderation-list";
 
 export function PhotoModeration({
@@ -35,6 +39,7 @@ export function PhotoModeration({
       }),
     [initialPhotos, photoOverrides, removedIds],
   );
+  const selectedPhotos = photos.filter((photo) => selected.includes(photo.id));
 
   function commitUpdates(
     updates: Array<{
@@ -124,43 +129,116 @@ export function PhotoModeration({
     }
   }
 
-  async function bulk(operation: "approve" | "reject") {
+  async function bulk(operation: "approve" | "reject" | "delete") {
+    const targets = selectedPhotos;
+    if (!targets.length) return;
+    if (operation === "delete") {
+      const noun = targets.length === 1 ? "photograph" : "photographs";
+      if (
+        !window.confirm(
+          `Permanently delete ${targets.length} selected ${noun}? This cannot be undone.`,
+        )
+      )
+        return;
+    }
+
     setBusy(true);
     setPendingKey(`bulk:${operation}`);
-    const targets = photos.filter(({ id }) => selected.includes(id));
+    const successfulIds: string[] = [];
+    const failedIds: string[] = [];
+    const updates: Array<{
+      id: string;
+      revision: number;
+      status: AdminPhoto["status"];
+    }> = [];
     try {
-      const response = await fetch("/api/admin/photos/bulk", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          action: operation,
-          photos: targets.map(({ id, revision }) => ({ id, revision })),
-        }),
-      });
-      const result = (await response.json()) as {
-        results?: Array<{
-          id: string;
-          ok: boolean;
-          photo?: { revision: number; status: AdminPhoto["status"] };
-        }>;
-      };
-      const outcomes = result.results ?? [];
-      commitUpdates(
-        outcomes.flatMap((outcome) =>
-          outcome.ok && outcome.photo
-            ? [{ id: outcome.id, ...outcome.photo }]
-            : [],
-        ),
-      );
-      if (outcomes.length && outcomes.every(({ ok }) => ok))
-        toastSuccess("Selected photographs updated.");
-      else toastError("Some photographs could not be updated.");
-    } catch (error) {
-      toastError(
-        error instanceof Error
-          ? error.message
-          : "Selected photographs could not be updated.",
-      );
+      for (
+        let start = 0;
+        start < targets.length;
+        start += maximumPhotoBulkBatchSize
+      ) {
+        const batch = targets.slice(start, start + maximumPhotoBulkBatchSize);
+        try {
+          const response = await fetch("/api/admin/photos/bulk", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              action: operation,
+              photos: batch.map(({ id, revision }) => ({ id, revision })),
+            }),
+          });
+          const result = (await response.json()) as {
+            error?: string;
+            results?: Array<{
+              id: string;
+              ok: boolean;
+              photo?: { revision: number; status: AdminPhoto["status"] };
+            }>;
+          };
+          if (!Array.isArray(result.results))
+            throw new Error(result.error ?? "The selected photographs failed.");
+
+          const outcomes = new Map(
+            result.results.map((outcome) => [outcome.id, outcome]),
+          );
+          for (const photo of batch) {
+            const outcome = outcomes.get(photo.id);
+            if (!outcome?.ok) {
+              failedIds.push(photo.id);
+              continue;
+            }
+            if (operation === "delete") {
+              successfulIds.push(photo.id);
+              continue;
+            }
+            if (!outcome.photo) {
+              failedIds.push(photo.id);
+              continue;
+            }
+            successfulIds.push(photo.id);
+            updates.push({ id: photo.id, ...outcome.photo });
+          }
+        } catch {
+          failedIds.push(...targets.slice(start).map(({ id }) => id));
+          break;
+        }
+      }
+
+      if (updates.length) commitUpdates(updates);
+      if (operation === "delete" && successfulIds.length) {
+        setRemovedIds((current) =>
+          new Set([...current, ...successfulIds]),
+        );
+      }
+      setSelected(failedIds);
+
+      const successCount = successfulIds.length;
+      const failureCount = failedIds.length;
+      if (operation === "delete") {
+        if (!failureCount) {
+          toastSuccess(
+            `${successCount} photograph${successCount === 1 ? "" : "s"} deleted`,
+          );
+        } else {
+          toastError(
+            `${failureCount} photograph${failureCount === 1 ? "" : "s"} could not be deleted`,
+            successCount
+              ? `${successCount} deleted. Failed photographs remain selected.`
+              : "Failed photographs remain selected for retry.",
+          );
+        }
+      } else if (!failureCount) {
+        toastSuccess(
+          `${successCount} selected photograph${successCount === 1 ? "" : "s"} ${operation === "approve" ? "approved" : "rejected"}.`,
+        );
+      } else {
+        toastError(
+          `${failureCount} photograph${failureCount === 1 ? "" : "s"} could not be updated`,
+          successCount
+            ? `${successCount} updated. Failed photographs remain selected.`
+            : "Failed photographs remain selected for retry.",
+        );
+      }
     } finally {
       setBusy(false);
       setPendingKey(null);
@@ -206,11 +284,25 @@ export function PhotoModeration({
     <div className="mt-10">
       <div className="border-wedding-navy/14 flex flex-wrap items-center gap-3 border-y py-4">
         <span className="text-xs font-bold uppercase">
-          {selected.length} selected
+          {selectedPhotos.length} selected
         </span>
         <Button
           type="button"
-          disabled={!selected.length || busy}
+          disabled={busy || selectedPhotos.length === photos.length}
+          onClick={() => setSelected(photos.map(({ id }) => id))}
+        >
+          Select loaded
+        </Button>
+        <Button
+          type="button"
+          disabled={busy || !selected.length}
+          onClick={() => setSelected([])}
+        >
+          Clear selection
+        </Button>
+        <Button
+          type="button"
+          disabled={!selectedPhotos.length || busy}
           isLoading={pendingKey === "bulk:approve"}
           onClick={() => void bulk("approve")}
         >
@@ -218,11 +310,20 @@ export function PhotoModeration({
         </Button>
         <Button
           type="button"
-          disabled={!selected.length || busy}
+          disabled={!selectedPhotos.length || busy}
           isLoading={pendingKey === "bulk:reject"}
           onClick={() => void bulk("reject")}
         >
           {pendingKey === "bulk:reject" ? "Rejecting..." : "Reject selected"}
+        </Button>
+        <Button
+          type="button"
+          disabled={!selectedPhotos.length || busy}
+          isLoading={pendingKey === "bulk:delete"}
+          onClick={() => void bulk("delete")}
+        >
+          <Trash2 className="size-4" aria-hidden="true" />
+          {pendingKey === "bulk:delete" ? "Deleting..." : "Delete selected"}
         </Button>
       </div>
       <div className="mt-6 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
@@ -235,6 +336,7 @@ export function PhotoModeration({
               <input
                 type="checkbox"
                 checked={selected.includes(photo.id)}
+                disabled={busy}
                 onChange={(event) =>
                   setSelected((current) =>
                     event.target.checked
