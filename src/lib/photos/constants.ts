@@ -6,6 +6,7 @@ export const guestPhotoMimeTypes = [
 export const maximumGuestPhotoBytes = 10_000_000;
 export const maximumGuestPhotoDimension = 8192;
 export const maximumGuestPhotoBatch = 50;
+export const maximumPhotoBulkBatchSize = 24;
 export const guestPhotoUploadConcurrency = 4;
 export const maximumPhotoCaptionLength = 240;
 
